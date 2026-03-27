@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/kjuiop/live-platform-go/cmd/controller/app"
 	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/kjuiop/live-platform-go/cmd/controller/app"
 )
 
 var (

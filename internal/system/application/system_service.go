@@ -2,9 +2,10 @@ package application
 
 import (
 	"context"
+	"time"
+
 	"github.com/kjuiop/live-platform-go/internal/system/domain"
 	sysin "github.com/kjuiop/live-platform-go/internal/system/port/in"
-	"time"
 )
 
 var _ sysin.SystemService = (*SystemServiceImpl)(nil)

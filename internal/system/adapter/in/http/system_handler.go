@@ -1,9 +1,11 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
-	sysin "github.com/kjuiop/live-platform-go/internal/system/port/in"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	sysin "github.com/kjuiop/live-platform-go/internal/system/port/in"
 )
 
 type SystemHandler struct {

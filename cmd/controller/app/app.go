@@ -2,13 +2,14 @@ package app
 
 import (
 	"context"
+	"log"
+	"sync"
+
 	"github.com/kjuiop/live-platform-go/config"
 	syscontroller "github.com/kjuiop/live-platform-go/internal/system/adapter/in/http"
 	sysapp "github.com/kjuiop/live-platform-go/internal/system/application"
 	"github.com/kjuiop/live-platform-go/logger"
 	"github.com/kjuiop/live-platform-go/platform/http"
-	"log"
-	"sync"
 )
 
 type App struct {

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 스테이징된 go 변경이 없으면 스킵
+STAGED_GO=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.go$' || true)
+if [ -z "$STAGED_GO" ]; then
+  echo "[pre-commit] No staged .go files. Skipping."
+  exit 0
+fi
+
+echo "[pre-commit] Running goimports (auto-fix)..."
+goimports -w -local github.com/kjuiop/live-platform-go $STAGED_GO
+git add $STAGED_GO
+echo "[pre-commit] goimports applied."
+
+echo "[pre-commit] Running golangci-lint..."
+golangci-lint run --timeout=5m
+echo "[pre-commit] golangci-lint passed."

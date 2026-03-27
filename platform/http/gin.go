@@ -4,13 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/kjuiop/live-platform-go/config"
 	"log"
 	"log/slog"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/kjuiop/live-platform-go/config"
 )
 
 type Gin struct {

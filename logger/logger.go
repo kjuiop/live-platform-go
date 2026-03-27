@@ -2,12 +2,14 @@ package logger
 
 import (
 	"fmt"
-	"github.com/kjuiop/live-platform-go/config"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log/slog"
 	"os"
 	"strings"
+
+	"gopkg.in/natefinch/lumberjack.v2"
+
+	"github.com/kjuiop/live-platform-go/config"
 )
 
 func SlogInit(cfg config.Logger) error {
