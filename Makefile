@@ -26,6 +26,8 @@ api: config api-build
 
 worker: config worker-build
 
+build: config api-build worker-build
+
 config:
 	@if [ ! -d $(TARGET_DIR) ]; then mkdir $(TARGET_DIR); fi
 
@@ -59,5 +61,5 @@ build_num:
 
 clean:
 	@echo "Cleaning up..."
-	@rm -f coverage.out live-chat-api live-chat-worker
+	@rm -f coverage.out live-chat-api live-chat-worker $(TARGET_DIR)/*
 	@echo "Cleanup completed."
