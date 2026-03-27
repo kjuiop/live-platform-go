@@ -13,7 +13,7 @@ description: 현재 브랜치의 커밋을 분석해 PR을 생성합니다
    - `git diff main...HEAD --stat`
 
 2. 커밋 내역과 변경 파일을 분석해 PR 제목과 본문을 작성하세요.
-   - 제목: 70자 이내
+   - 제목: 커밋 메시지를 그대로 쓰지 말고, 변경 내용을 파악해 **직접 의미 있는 제목**을 작성합니다 (70자 이내)
    - 본문: 반드시 `.github/pull_request_template.md` 파일을 읽어 **HTML 주석(`<!-- ... -->`)을 포함한 전체 내용을 그대로** 사용합니다
      - 템플릿의 모든 섹션(Summary, Issue, Why, What, How, Test)을 유지합니다
      - 상단 Copilot Review Instruction 주석 블록도 반드시 포함합니다

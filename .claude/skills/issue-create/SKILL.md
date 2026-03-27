@@ -27,11 +27,25 @@ description: 입력 내용을 분석해 적절한 템플릿으로 GitHub 이슈�
 - 입력 내용을 바탕으로 각 섹션을 최대한 채웁니다
 - 비워도 되는 섹션은 그대로 두고, 채울 수 있는 섹션은 구체적으로 작성합니다
 
-## 3. 이슈 생성
+## 3. 이슈 제목 작성
+
+제목은 아래 접두어를 붙여 작성합니다. 접두어는 템플릿과 매핑되며, 내용에 어울리는 단어를 선택합니다:
+
+| 템플릿 | 접두어 후보 | 예시 |
+|--------|-----------|------|
+| `bug_report` | `bug`, `fix`, `hotfix` | `[bug] 채팅방 입장 시 WebSocket 연결 끊김` |
+| `feature` | `feat` | `[feat] Kafka Consumer Group 설정 추가` |
+| `refactoring` | `refactor`, `cleanup`, `perf` | `[refactor] room 패키지 도메인 구조 분리` |
+| `task` | `docs`, `chore`, `config`, `ci` | `[docs] README 기술 스택 항목 보완` |
+
+- 접두어는 `[접두어]` 형식으로 제목 맨 앞에 붙입니다
+- 제목은 50자 이내로 간결하게 작성합니다
+
+## 4. 이슈 생성
 
 ```
 gh issue create \
-  --title "제목" \
+  --title "[접두어] 제목" \
   --body "본문" \
   --label "라벨"
 ```
@@ -42,7 +56,7 @@ gh issue create \
 - `refactoring` → `--label refactoring`
 - `task` → 라벨 없음
 
-## 4. 결과 출력
+## 5. 결과 출력
 
 - 생성된 이슈 URL
 - 선택한 템플릿 종류
