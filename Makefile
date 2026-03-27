@@ -30,11 +30,11 @@ config:
 	@if [ ! -d $(TARGET_DIR) ]; then mkdir $(TARGET_DIR); fi
 
 api-build:
-	GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(API_OUTPUT) $(PROJECT_PATH)/$(API_MAIN)
+	go build -ldflags "$(LDFLAGS)" -o $(API_OUTPUT) $(PROJECT_PATH)/$(API_MAIN)
 	cp $(API_OUTPUT) ./live-chat-api
 
 worker-build:
-	GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(WORKER_OUTPUT) $(PROJECT_PATH)/$(WORKER_MAIN)
+	go build -ldflags "$(LDFLAGS)" -o $(WORKER_OUTPUT) $(PROJECT_PATH)/$(WORKER_MAIN)
 	cp $(WORKER_OUTPUT) ./live-chat-worker
 
 test:
@@ -59,5 +59,5 @@ build_num:
 
 clean:
 	@echo "Cleaning up..."
-	@rm -f $(APP_NAME) coverage.out
+	@rm -f coverage.out live-chat-api live-chat-worker
 	@echo "Cleanup completed."
