@@ -21,7 +21,7 @@ func main() {
 	wg := sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(context.Background())
 
-	a := app.NewApplication(ctx)
+	a := app.NewApplication(ctx, GIT_HASH, APP_VERSION)
 	wg.Add(1)
 	go a.Start(&wg)
 

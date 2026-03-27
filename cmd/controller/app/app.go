@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"github.com/kjuiop/live-platform-go/config"
+	syscontroller "github.com/kjuiop/live-platform-go/internal/system/adapter/in/http"
+	sysapp "github.com/kjuiop/live-platform-go/internal/system/application"
 	"github.com/kjuiop/live-platform-go/logger"
 	"github.com/kjuiop/live-platform-go/platform/http"
 	"log"
@@ -10,11 +12,14 @@ import (
 )
 
 type App struct {
+	gitHash string
+	version string
+
 	cfg *config.EnvConfig
 	srv *http.Gin
 }
 
-func NewApplication(ctx context.Context) *App {
+func NewApplication(ctx context.Context, gitHash, version string) *App {
 
 	cfg, err := config.LoadEnvConfig()
 	if err != nil {
@@ -27,10 +32,17 @@ func NewApplication(ctx context.Context) *App {
 
 	srv := http.NewGinServer(cfg.Server)
 
-	return &App{
+	app := &App{
+		gitHash: gitHash,
+		version: version,
+
 		cfg: cfg,
 		srv: srv,
 	}
+
+	app.setupRouter()
+
+	return app
 }
 
 func (a *App) Start(wg *sync.WaitGroup) {
@@ -40,4 +52,22 @@ func (a *App) Start(wg *sync.WaitGroup) {
 
 func (a *App) Stop(ctx context.Context) {
 	a.srv.Shutdown(ctx)
+}
+
+func (a *App) setupRouter() {
+
+	// application service register
+	sysService := sysapp.NewSystemService(a.version, a.gitHash)
+
+	// controller register
+	sysHandler := syscontroller.NewSystemHandler(sysService)
+
+	// router
+	router := a.srv.GetEngine()
+
+	// router register
+	v1 := router.Group("/api/v1")
+	{
+		sysHandler.RegisterRoutes(v1.Group("/system"))
+	}
 }
