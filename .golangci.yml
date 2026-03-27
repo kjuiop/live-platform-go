@@ -8,21 +8,20 @@ linters:
     - bodyclose
     - contextcheck
     - unused
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
 
 formatters:
   enable:
     - gofmt
     - goimports
-
-formatters-settings:
-  goimports:
-    local-prefixes: github.com/kjuiop/live-platform-go
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/kjuiop/live-platform-go
 
 run:
   timeout: 5m
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
