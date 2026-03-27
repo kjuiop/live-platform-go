@@ -18,7 +18,7 @@
 
 ## ⚙️ 기술 스택
 
-- **언어**: Go 1.23
+- **언어**: Go 1.25
 - **웹 프레임워크**: Gin
 - **WebSocket**: Gorilla WebSocket
 - **데이터 저장소**: Redis

@@ -9,8 +9,8 @@ description: 현재 브랜치의 커밋을 분석해 PR을 생성합니다
 
 1. 아래 명령어를 병렬로 실행해 현재 상태를 파악하세요:
    - `git status`
-   - `git log main..HEAD --oneline`
-   - `git diff main...HEAD --stat`
+   - `git log develop..HEAD --oneline`
+   - `git diff develop...HEAD --stat`
 
 2. 커밋 내역과 변경 파일을 분석해 PR 제목과 본문을 작성하세요.
    - 제목: 커밋 메시지를 그대로 쓰지 말고, 변경 내용을 파악해 **직접 의미 있는 제목**을 작성합니다 (70자 이내)
@@ -23,7 +23,7 @@ description: 현재 브랜치의 커밋을 분석해 PR을 생성합니다
    - 원격 브랜치가 없으면 **즉시 중단**하고 사용자에게 알립니다 (push 금지)
    - 원격 브랜치가 있으면 PR을 생성하세요:
    ```
-   gh pr create --title "..." --body "$(cat <<'EOF'
+   gh pr create --base develop --title "..." --body "$(cat <<'EOF'
    <!-- 템플릿 전체 내용 (주석 포함) -->
    EOF
    )"

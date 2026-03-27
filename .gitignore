@@ -4,3 +4,7 @@
 # claude
 docs/claude
 CLAUDE.md
+
+# bin
+live-chat-api
+live-chat-worker
