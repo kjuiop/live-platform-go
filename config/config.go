@@ -9,15 +9,15 @@ type EnvConfig struct {
 	Server Server
 }
 type Logger struct {
-	Level       string `envconfig:"LCK_LOG_LEVEL" default:"debug"`
-	Path        string `envconfig:"LCK_LOG_PATH" default:"./logs/access.log"`
-	PrintStdOut bool   `envconfig:"LCK_LOG_STDOUT" default:"true"`
+	Level       string `envconfig:"LPG_LOG_LEVEL" default:"debug"`
+	Path        string `envconfig:"LPG_LOG_PATH" default:"./logs/access.log"`
+	PrintStdOut bool   `envconfig:"LPG_LOG_STDOUT" default:"true"`
 }
 
 type Server struct {
-	Mode           string `envconfig:"LCK_ENV" default:"dev"`
-	Port           string `envconfig:"LCK_SERVER_PORT" default:"8090"`
-	TrustedProxies string `envconfig:"LCK_TRUSTED_PROXIES" default:"127.0.0.1/32"`
+	Mode           string `envconfig:"LPG_ENV" default:"dev"`
+	Port           string `envconfig:"LPG_SERVER_PORT" default:"8080"`
+	TrustedProxies string `envconfig:"LPG_TRUSTED_PROXIES" default:"127.0.0.1/32"`
 }
 
 func LoadEnvConfig() (*EnvConfig, error) {
