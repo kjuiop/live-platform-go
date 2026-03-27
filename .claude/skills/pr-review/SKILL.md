@@ -40,7 +40,9 @@ description: 현재 브랜치의 열린 PR을 Go 서버 관점에서 리뷰하�
      ```
      gh api repos/{owner}/{repo}/pulls/{pr_number}/comments \
        --method POST \
-       --field body="코멘트 내용" \
+       --field body="🤖 Claude Review
+
+코멘트 내용" \
        --field commit_id="<커밋 SHA>" \
        --field path="파일 경로" \
        --field line=<라인 번호> \
@@ -50,7 +52,9 @@ description: 현재 브랜치의 열린 PR을 Go 서버 관점에서 리뷰하�
    - `line`은 diff 기준 **변경된 라인(+줄)**의 번호를 사용합니다
    - 지적할 라인이 없는 종합 의견은 PR review comment로 남깁니다:
      ```
-     gh pr review --comment --body "..."
+     gh pr review --comment --body "🤖 Claude Review
+
+..."
      ```
 
 6. 리뷰 결과 요약을 출력합니다 (LGTM / 수정 필요 항목).
