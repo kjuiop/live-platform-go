@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/kjuiop/live-platform-go/config"
 	syscontroller "github.com/kjuiop/live-platform-go/internal/system/adapter/in/http"
@@ -51,8 +52,11 @@ func (a *App) Start(wg *sync.WaitGroup) {
 	a.srv.Run()
 }
 
-func (a *App) Stop(ctx context.Context) {
-	a.srv.Shutdown(ctx)
+func (a *App) Stop() {
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+
+	a.srv.Shutdown(shutdownCtx)
 }
 
 func (a *App) setupRouter() {

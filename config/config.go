@@ -10,19 +10,19 @@ type EnvConfig struct {
 	Policy Policy
 }
 type Logger struct {
-	Level       string `envconfig:"LPG_LOG_LEVEL" default:"debug"`
-	Path        string `envconfig:"LPG_LOG_PATH" default:"./logs/access.log"`
-	PrintStdOut bool   `envconfig:"LPG_LOG_STDOUT" default:"true"`
+	Level       string `envconfig:"LOG_LEVEL" default:"debug"`
+	Path        string `envconfig:"LOG_PATH" default:"./logs/access.log"`
+	PrintStdOut bool   `envconfig:"LOG_STDOUT" default:"true"`
 }
 
 type Server struct {
-	Mode           string `envconfig:"LPG_ENV" default:"dev"`
-	Port           string `envconfig:"LPG_SERVER_PORT" default:"8080"`
-	TrustedProxies string `envconfig:"LPG_TRUSTED_PROXIES" default:"127.0.0.1/32"`
+	Mode           string `envconfig:"ENV" default:"dev"`
+	Port           string `envconfig:"SERVER_PORT" default:"8080"`
+	TrustedProxies string `envconfig:"TRUSTED_PROXIES" default:"127.0.0.1/32"`
 }
 
 type Policy struct {
-	ContextTimeout int `envconfig:"LCS_CONTEXT_TIMEOUT" default:"60"`
+	ContextTimeout int `envconfig:"POLICY_CONTEXT_TIMEOUT" default:"60"`
 }
 
 func LoadEnvConfig() (*EnvConfig, error) {

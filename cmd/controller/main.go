@@ -29,9 +29,10 @@ func main() {
 	slog.Info("live chat api app start", "git_hash", GIT_HASH, "build_time", BUILD_TIME, "app_version", APP_VERSION)
 
 	<-exitSignal()
-	a.Stop(ctx)
 	cancel()
+	a.Stop()
 	wg.Wait()
+
 	slog.Info("live chat api app gracefully shutdown")
 }
 
