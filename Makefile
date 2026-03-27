@@ -65,11 +65,20 @@ build_num:
 	@echo $$(($$(cat $(BUILD_NUM_FILE)) + 1 )) > $(BUILD_NUM_FILE)
 	@echo "BUILD_NUM      : $(BUILD_NUM)"
 
+git-setup: git-template git-hooks
+	@echo "✅ Done. (repo-local git template + hooks applied)"
+
+git-template:
+	@echo "Setting git commit template..."
+	@git config commit.template .gitmessage.txt
+	@echo "Done."
+
 git-hooks:
 	@echo "Enabling repo hooks (.githooks)..."
 	@git config core.hooksPath .githooks
+	@chmod +x .githooks/commit-msg
 	@chmod +x .githooks/pre-commit
-	@echo "Done. (pre-commit hook active)"
+	@echo "Done. (commit-msg & pre-commit hook active)"
 
 clean:
 	@echo "Cleaning up..."
