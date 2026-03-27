@@ -21,13 +21,16 @@ type Gin struct {
 	cfg    config.Server
 }
 
-func NewGinServer(cfg config.Server) *Gin {
+func NewGinServer(cfg config.Server) (*Gin, error) {
 
 	router := getGinEngine(cfg.Mode)
 
-	if err := router.SetTrustedProxies(strings.Split(cfg.TrustedProxies, ",")); err != nil {
-		log.Fatalf("failed to set trusted proxies: %v", err)
+	proxies := splitAndTrim(cfg.TrustedProxies, ",")
+	if err := router.SetTrustedProxies(proxies); err != nil {
+		return nil, fmt.Errorf("failed to set trusted proxies: %w", err)
 	}
+
+	router.Use(gin.Recovery())
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Port),
@@ -40,7 +43,7 @@ func NewGinServer(cfg config.Server) *Gin {
 		srv:    srv,
 		router: router,
 		cfg:    cfg,
-	}
+	}, nil
 }
 
 func (g *Gin) Run() {
@@ -72,4 +75,15 @@ func getGinEngine(mode string) *gin.Engine {
 	default:
 		return gin.Default()
 	}
+}
+
+func splitAndTrim(str, sep string) []string {
+	parts := strings.Split(str, sep)
+	var proxies []string
+	for _, p := range parts {
+		if trimmed := strings.TrimSpace(p); trimmed != "" {
+			proxies = append(proxies, trimmed)
+		}
+	}
+	return proxies
 }

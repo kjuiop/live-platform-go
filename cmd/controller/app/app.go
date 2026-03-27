@@ -32,7 +32,10 @@ func NewApplication(ctx context.Context, gitHash, version string) *App {
 		log.Fatalf("failed to initialize logger: %v", err)
 	}
 
-	srv := http.NewGinServer(cfg.Server)
+	srv, err := http.NewGinServer(cfg.Server)
+	if err != nil {
+		log.Fatalf("failed to initialize http server: %v", err)
+	}
 
 	app := &App{
 		gitHash: gitHash,

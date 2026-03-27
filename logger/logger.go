@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -20,8 +21,12 @@ func SlogInit(cfg config.Logger) error {
 
 	var logWriter io.Writer
 	if cfg.PrintStdOut {
-		logWriter = io.MultiWriter(os.Stdout)
+		logWriter = os.Stdout
 	} else {
+		dir := filepath.Dir(cfg.Path)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("failed to create log directory %s: %w", dir, err)
+		}
 		fileWriter := &lumberjack.Logger{
 			Filename:   cfg.Path,
 			MaxSize:    100, // megabytes
