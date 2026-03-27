@@ -37,13 +37,22 @@ make test
 ### BUILD
 
 ```shell
-make build
+# API 서버 빌드
+make api
+
+# Worker 빌드
+make worker
 ```
 
 
 ### RUN
+
 ```shell
-./live-chat-server
+# API 서버 실행
+./live-chat-api
+
+# Worker 실행
+./live-chat-worker
 ```
 
 <br />

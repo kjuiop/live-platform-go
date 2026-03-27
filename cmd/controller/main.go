@@ -1,7 +1,14 @@
 package main
 
 import (
+	"context"
 	"log/slog"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+
+	"github.com/kjuiop/live-platform-go/cmd/controller/app"
 )
 
 var (
@@ -11,5 +18,26 @@ var (
 )
 
 func main() {
+
+	wg := sync.WaitGroup{}
+	ctx, cancel := context.WithCancel(context.Background())
+
+	a := app.NewApplication(ctx, GIT_HASH, APP_VERSION)
+	wg.Add(1)
+	go a.Start(&wg)
+
 	slog.Info("live chat api app start", "git_hash", GIT_HASH, "build_time", BUILD_TIME, "app_version", APP_VERSION)
+
+	<-exitSignal()
+	cancel()
+	a.Stop()
+	wg.Wait()
+
+	slog.Info("live chat api app gracefully shutdown")
+}
+
+func exitSignal() <-chan os.Signal {
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	return sig
 }

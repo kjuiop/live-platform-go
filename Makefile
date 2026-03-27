@@ -20,13 +20,15 @@ LDFLAGS+=-X main.APP_VERSION=$(TARGET_VERSION)
 LDFLAGS+=-X main.GIT_HASH=`git rev-parse HEAD`
 LDFLAGS+=-s -w
 
-.PHONY: build api-build worker-build test lint target-version build_num clean
+LOCAL_PREFIX=github.com/kjuiop/live-platform-go
 
-api: config api-build
+.PHONY: build api-build worker-build test fmt lint target-version build_num clean
 
-worker: config worker-build
+api: config fmt lint api-build
 
-build: config api-build worker-build
+worker: config fmt lint worker-build
+
+build: config fmt lint api-build worker-build
 
 config:
 	@if [ ! -d $(TARGET_DIR) ]; then mkdir $(TARGET_DIR); fi
@@ -44,9 +46,13 @@ test:
 	@go clean -testcache
 	@go test -race -coverprofile=coverage.out ./...
 
+fmt:
+	@echo "Running goimports..."
+	@goimports -w -local $(LOCAL_PREFIX) $(shell find . -name "*.go" -not -path "./.git/*")
+
 lint:
 	@echo "Running linters..."
-	@golangci-lint run ./...
+	@golangci-lint run --timeout=5m
 
 target-version:
 	@echo "========================================"
@@ -58,6 +64,21 @@ target-version:
 build_num:
 	@echo $$(($$(cat $(BUILD_NUM_FILE)) + 1 )) > $(BUILD_NUM_FILE)
 	@echo "BUILD_NUM      : $(BUILD_NUM)"
+
+git-setup: git-template git-hooks
+	@echo "✅ Done. (repo-local git template + hooks applied)"
+
+git-template:
+	@echo "Setting git commit template..."
+	@git config commit.template .gitmessage.txt
+	@echo "Done."
+
+git-hooks:
+	@echo "Enabling repo hooks (.githooks)..."
+	@git config core.hooksPath .githooks
+	@chmod +x .githooks/commit-msg
+	@chmod +x .githooks/pre-commit
+	@echo "Done. (commit-msg & pre-commit hook active)"
 
 clean:
 	@echo "Cleaning up..."

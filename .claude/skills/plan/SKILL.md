@@ -28,9 +28,9 @@ description: 현재 GitHub 이슈를 분석해 docs/claude/ 아래에 상세 구
 
 ## 3. 문서 파일명 결정
 
-- 형식: `docs/claude/issue-{번호}-{짧은-슬러그}.md`
-- 예시: `docs/claude/issue-3-go-project-init.md`
-- `docs/claude/` 디렉터리가 없으면 생성합니다
+- 형식: `docs/claude/plan/issue-{번호}-{짧은-슬러그}.md`
+- 예시: `docs/claude/plan/issue-3-go-project-init.md`
+- `docs/claude/plan/` 디렉터리가 없으면 생성합니다
 
 ## 4. 계획 문서 작성
 
