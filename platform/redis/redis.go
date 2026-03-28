@@ -47,18 +47,8 @@ func (r *Client) HSet(ctx context.Context, key string, data interface{}, expirat
 		pipe.Expire(ctx, key, expiration)
 	}
 
-	cmds, err := pipe.Exec(ctx)
-	if err != nil {
+	if _, err := pipe.Exec(ctx); err != nil {
 		return fmt.Errorf("redis pipeline exec error: %w", err)
-	}
-
-	for _, cmd := range cmds {
-		if cmd.Err() != nil {
-			if delErr := r.client.Del(ctx, key); delErr != nil {
-				slog.Warn("warn rollback delete failed, key : %s, err : %s", key, delErr)
-			}
-			return fmt.Errorf("redis pipeline exec error: %w", cmd.Err())
-		}
 	}
 
 	return nil
