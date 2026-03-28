@@ -46,18 +46,6 @@ func (r *RoomInfo) ConvertRedisData() RoomRedisData {
 	}
 }
 
-type RoomMapRedisData struct {
-	RoomId    string `redis:"room_id"`
-	CreatedAt int64  `redis:"created_at"`
-}
-
-func (r *RoomInfo) ConvertRedisRoomMapData() RoomMapRedisData {
-	return RoomMapRedisData{
-		RoomId:    r.RoomId,
-		CreatedAt: r.CreatedAt,
-	}
-}
-
 func getChatPrefix(prefix string) string {
 	array := strings.Split(prefix, ",")
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
