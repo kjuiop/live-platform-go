@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	roomRepo "github.com/kjuiop/live-platform-go/internal/room/adapter/out/redis"
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
 	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
+	roomoutport "github.com/kjuiop/live-platform-go/internal/room/port/out"
 )
 
 var _ roomin.RoomService = (*RoomServiceImpl)(nil)
 
 type RoomServiceImpl struct {
 	contextTimeout time.Duration
-	roomRepo       *roomRepo.RoomRedisRepository
+	roomRepo       roomoutport.RoomRepository
 }
 
-func NewRoomService(timeout time.Duration, roomRepo *roomRepo.RoomRedisRepository) *RoomServiceImpl {
+func NewRoomService(timeout time.Duration, roomRepo roomoutport.RoomRepository) *RoomServiceImpl {
 	return &RoomServiceImpl{
 		contextTimeout: timeout,
 		roomRepo:       roomRepo,
