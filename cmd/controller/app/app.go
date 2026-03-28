@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kjuiop/live-platform-go/platform/redis"
+
 	"github.com/kjuiop/live-platform-go/config"
 	syscontroller "github.com/kjuiop/live-platform-go/internal/system/adapter/in/http"
 	sysapp "github.com/kjuiop/live-platform-go/internal/system/application"
@@ -30,6 +32,11 @@ func NewApplication(ctx context.Context, gitHash, version string) *App {
 
 	if err := logger.SlogInit(cfg.Logger); err != nil {
 		log.Fatalf("failed to initialize logger: %v", err)
+	}
+
+	_, err = redis.NewRedisSingleClient(ctx, cfg.Redis)
+	if err != nil {
+		log.Fatalf("failed to initialize redis client: %v", err)
 	}
 
 	srv, err := http.NewGinServer(cfg.Server)
