@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kjuiop/live-platform-go/platform/redis"
+
 	"github.com/kjuiop/live-platform-go/config"
 	syscontroller "github.com/kjuiop/live-platform-go/internal/system/adapter/in/http"
 	sysapp "github.com/kjuiop/live-platform-go/internal/system/application"
@@ -17,8 +19,9 @@ type App struct {
 	gitHash string
 	version string
 
-	cfg *config.EnvConfig
-	srv *http.Gin
+	cfg  *config.EnvConfig
+	srv  *http.Gin
+	rcli *redis.Client
 }
 
 func NewApplication(ctx context.Context, gitHash, version string) *App {
@@ -32,6 +35,11 @@ func NewApplication(ctx context.Context, gitHash, version string) *App {
 		log.Fatalf("failed to initialize logger: %v", err)
 	}
 
+	rcli, err := redis.NewRedisSingleClient(ctx, cfg.Redis)
+	if err != nil {
+		log.Fatalf("failed to initialize redis client: %v", err)
+	}
+
 	srv, err := http.NewGinServer(cfg.Server)
 	if err != nil {
 		log.Fatalf("failed to initialize http server: %v", err)
@@ -41,8 +49,9 @@ func NewApplication(ctx context.Context, gitHash, version string) *App {
 		gitHash: gitHash,
 		version: version,
 
-		cfg: cfg,
-		srv: srv,
+		cfg:  cfg,
+		srv:  srv,
+		rcli: rcli,
 	}
 
 	app.setupRouter()
@@ -60,6 +69,7 @@ func (a *App) Stop() {
 	defer shutdownCancel()
 
 	a.srv.Shutdown(shutdownCtx)
+	a.rcli.Close()
 }
 
 func (a *App) setupRouter() {
