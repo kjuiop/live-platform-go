@@ -8,3 +8,6 @@ CLAUDE.md
 # bin
 live-chat-api
 live-chat-worker
+
+# test
+coverage.out

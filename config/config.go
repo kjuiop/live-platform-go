@@ -31,7 +31,8 @@ type Redis struct {
 }
 
 type Policy struct {
-	ContextTimeout int `envconfig:"POLICY_CONTEXT_TIMEOUT" default:"60"`
+	Prefix         string `envconfig:"LCS_ROOM_PREFIX" default:"N1,N2"`
+	ContextTimeout int    `envconfig:"POLICY_CONTEXT_TIMEOUT" default:"60"`
 }
 
 func LoadEnvConfig() (*EnvConfig, error) {

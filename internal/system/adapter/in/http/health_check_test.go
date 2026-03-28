@@ -51,10 +51,13 @@ func TestHealthCheck(t *testing.T) {
 				return
 			}
 
-			var body map[string]string
-			if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+			var apiResp struct {
+				Result map[string]string `json:"result"`
+			}
+			if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
 				t.Fatalf("failed to decode response body: %v", err)
 			}
+			body := apiResp.Result
 
 			if body["status"] != tt.wantStatus {
 				t.Errorf("status: got '%s', want '%s'", body["status"], tt.wantStatus)

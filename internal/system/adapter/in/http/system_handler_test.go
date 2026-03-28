@@ -53,6 +53,6 @@ func TestMain(m *testing.M) {
 func setupTestServer() *httptest.Server {
 	r := gin.New()
 	r.HandleMethodNotAllowed = true
-	testClient.systemHandler.RegisterRoutes(r.Group("/api/v1/system"))
+	testClient.systemHandler.RegisterRoutes(r.Group("/api/v1"))
 	return httptest.NewServer(r)
 }

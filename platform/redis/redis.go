@@ -39,6 +39,25 @@ func NewRedisSingleClient(ctx context.Context, cfg config.Redis) (*Client, error
 	}, nil
 }
 
+func (r *Client) HSet(ctx context.Context, key string, data interface{}, expiration time.Duration) error {
+
+	pipe := r.client.TxPipeline()
+	pipe.HSet(ctx, key, data)
+	if expiration > 0 {
+		pipe.Expire(ctx, key, expiration)
+	}
+
+	if _, err := pipe.Exec(ctx); err != nil {
+		return fmt.Errorf("redis pipeline exec error: %w", err)
+	}
+
+	return nil
+}
+
+func (r *Client) HSetField(ctx context.Context, key, field string, value interface{}) error {
+	return r.client.HSet(ctx, key, field, value).Err()
+}
+
 func (r *Client) Close() {
 	if err := r.client.Close(); err != nil {
 		slog.Error("fail close redis client", "error", err)

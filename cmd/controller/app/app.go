@@ -6,6 +6,10 @@ import (
 	"sync"
 	"time"
 
+	roomcontroller "github.com/kjuiop/live-platform-go/internal/room/adapter/in/http"
+	roomRepo "github.com/kjuiop/live-platform-go/internal/room/adapter/out/redis"
+	roomapp "github.com/kjuiop/live-platform-go/internal/room/application"
+
 	"github.com/kjuiop/live-platform-go/platform/redis"
 
 	"github.com/kjuiop/live-platform-go/config"
@@ -74,11 +78,18 @@ func (a *App) Stop() {
 
 func (a *App) setupRouter() {
 
+	timeout := time.Duration(a.cfg.Policy.ContextTimeout) * time.Second
+
+	// repository
+	roomRepository := roomRepo.NewRoomRedisRepository(a.rcli)
+
 	// application service register
 	sysService := sysapp.NewSystemService(a.version, a.gitHash)
+	roomService := roomapp.NewRoomService(timeout, roomRepository)
 
 	// controller register
 	sysHandler := syscontroller.NewSystemHandler(sysService)
+	roomHandler := roomcontroller.NewRoomHandler(a.cfg.Policy, roomService)
 
 	// router
 	router := a.srv.GetEngine()
@@ -86,6 +97,7 @@ func (a *App) setupRouter() {
 	// router register
 	v1 := router.Group("/api/v1")
 	{
-		sysHandler.RegisterRoutes(v1.Group("/system"))
+		sysHandler.RegisterRoutes(v1)
+		roomHandler.RegisterRoutes(v1)
 	}
 }
