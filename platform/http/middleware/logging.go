@@ -20,43 +20,36 @@ func LoggingMiddleware() gin.HandlerFunc {
 		// Process request
 		c.Next()
 
-		// Fill the params
-		param := gin.LogFormatterParams{}
-
-		param.TimeStamp = time.Now() // Stop timer
-		param.Latency = param.TimeStamp.Sub(start)
-		if param.Latency > time.Minute {
-			param.Latency = param.Latency.Truncate(time.Second)
+		latency := time.Since(start)
+		if latency > time.Minute {
+			latency = latency.Truncate(time.Second)
 		}
 
-		param.ClientIP = c.ClientIP()
-		param.Method = c.Request.Method
-		param.StatusCode = c.Writer.Status()
-		param.ErrorMessage = c.Errors.ByType(gin.ErrorTypePrivate).String()
-		param.BodySize = c.Writer.Size()
 		if raw != "" {
 			path = path + "?" + raw
 		}
-		param.Path = path
+
+		statusCode := c.Writer.Status()
+		errorMessage := c.Errors.ByType(gin.ErrorTypePrivate).String()
 
 		logger := slog.With(
 			"request_id", requestId,
-			"client_ip", param.ClientIP,
-			"method", param.Method,
-			"status_code", param.StatusCode,
-			"body_size", param.BodySize,
-			"path", param.Path,
+			"client_ip", c.ClientIP(),
+			"method", c.Request.Method,
+			"status_code", statusCode,
+			"body_size", c.Writer.Size(),
+			"path", path,
 			"user_agent", c.Request.UserAgent(),
-			"latency", param.Latency.String(),
+			"latency", latency.String(),
 		)
 
 		switch {
-		case IsSuccess(param.StatusCode):
+		case IsSuccess(statusCode):
 			logger.Info("success")
-		case IsClientError(param.StatusCode):
-			logger.Warn("client error", "error_message", param.ErrorMessage)
-		case IsServerError(param.StatusCode):
-			logger.Error("server error", "error_message", param.ErrorMessage)
+		case IsClientError(statusCode):
+			logger.Warn("client error", "error_message", errorMessage)
+		case IsServerError(statusCode):
+			logger.Error("server error", "error_message", errorMessage)
 		default:
 			logger.Warn("unexpected status code")
 		}
