@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kjuiop/live-platform-go/platform/http/middleware"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/kjuiop/live-platform-go/config"
@@ -30,7 +32,9 @@ func NewGinServer(cfg config.Server) (*Gin, error) {
 		return nil, fmt.Errorf("failed to set trusted proxies: %w", err)
 	}
 
-	router.Use(gin.Recovery())
+	router.Use(middleware.Recovery())
+	router.Use(middleware.LoggingMiddleware)
+	router.Use(middleware.SetCorsPolicy())
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Port),
@@ -68,13 +72,11 @@ func (g *Gin) GetEngine() *gin.Engine {
 func getGinEngine(mode string) *gin.Engine {
 	switch mode {
 	case "prod":
-		return gin.New()
+		gin.SetMode(gin.ReleaseMode)
 	case "test":
 		gin.SetMode(gin.TestMode)
-		return gin.Default()
-	default:
-		return gin.Default()
 	}
+	return gin.New()
 }
 
 func splitAndTrim(str, sep string) []string {
