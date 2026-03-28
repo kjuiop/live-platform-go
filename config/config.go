@@ -23,11 +23,11 @@ type Server struct {
 }
 
 type Redis struct {
-	Mode     string `envconfig:"LCK_REDIS_MODE" default:"single"`
-	Addr     string `envconfig:"LCK_REDIS_ADDR" default:":6379"`
-	Password string `envconfig:"LCK_REDIS_PASSWORD"`
-	Masters  string `envconfig:"LCK_REDIS_MASTERS"`
-	PoolSize int    `envconfig:"LCK_REDIS_POOL_SIZE" default:"100"`
+	Mode     string `envconfig:"REDIS_MODE" default:"single"`
+	Addr     string `envconfig:"REDIS_ADDR" default:":6379"`
+	Password string `envconfig:"REDIS_PASSWORD"`
+	Masters  string `envconfig:"REDIS_MASTERS"`
+	PoolSize int    `envconfig:"REDIS_POOL_SIZE" default:"100"`
 }
 
 type Policy struct {
