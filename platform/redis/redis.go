@@ -19,13 +19,18 @@ type Client struct {
 func NewRedisSingleClient(ctx context.Context, cfg config.Redis) (*Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:         cfg.Addr,
+		Password:     cfg.Password,
+		PoolSize:     cfg.PoolSize,
 		DialTimeout:  time.Second * 3,
 		ReadTimeout:  time.Second * 3,
 		WriteTimeout: time.Second * 3,
 	})
 
 	if err := client.Ping(ctx).Err(); err != nil {
-		return nil, fmt.Errorf("fail ping err : %w", err)
+		if cerr := client.Close(); cerr != nil {
+			slog.Error("fail close redis client after ping error", "error", cerr)
+		}
+		return nil, fmt.Errorf("failed to ping redis: %w", err)
 	}
 
 	return &Client{

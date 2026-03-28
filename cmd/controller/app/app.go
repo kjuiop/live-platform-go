@@ -19,8 +19,9 @@ type App struct {
 	gitHash string
 	version string
 
-	cfg *config.EnvConfig
-	srv *http.Gin
+	cfg  *config.EnvConfig
+	srv  *http.Gin
+	rcli *redis.Client
 }
 
 func NewApplication(ctx context.Context, gitHash, version string) *App {
@@ -34,7 +35,7 @@ func NewApplication(ctx context.Context, gitHash, version string) *App {
 		log.Fatalf("failed to initialize logger: %v", err)
 	}
 
-	_, err = redis.NewRedisSingleClient(ctx, cfg.Redis)
+	rcli, err := redis.NewRedisSingleClient(ctx, cfg.Redis)
 	if err != nil {
 		log.Fatalf("failed to initialize redis client: %v", err)
 	}
@@ -48,8 +49,9 @@ func NewApplication(ctx context.Context, gitHash, version string) *App {
 		gitHash: gitHash,
 		version: version,
 
-		cfg: cfg,
-		srv: srv,
+		cfg:  cfg,
+		srv:  srv,
+		rcli: rcli,
 	}
 
 	app.setupRouter()
@@ -67,6 +69,7 @@ func (a *App) Stop() {
 	defer shutdownCancel()
 
 	a.srv.Shutdown(shutdownCtx)
+	a.rcli.Close()
 }
 
 func (a *App) setupRouter() {
