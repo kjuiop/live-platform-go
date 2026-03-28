@@ -30,7 +30,15 @@ description: 현재 브랜치의 열린 PR을 Go 서버 관점에서 리뷰하�
    - **리소스 누수**: defer close, context 취소 전파
    - **성능**: 불필요한 alloc, blocking 호출 위치
 
-5. 리뷰 코멘트를 **라인별로** PR에 등록합니다:
+5. PR에 이미 달린 **기존 코멘트(Copilot 포함)**를 가져와 중복을 방지합니다:
+   ```
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --jq '[.[] | {path: .path, line: .line, body: .body}]'
+   gh api repos/{owner}/{repo}/issues/{pr_number}/comments --jq '[.[] | {body: .body}]'
+   ```
+   - 기존 코멘트와 **동일하거나 유사한 지적**(같은 파일·라인, 같은 문제)은 등록하지 않습니다
+   - 이미 Copilot이 지적한 내용은 건너뜁니다
+
+6. 리뷰 코멘트를 **라인별로** PR에 등록합니다:
    - 전체 요약 댓글 하나로 올리지 않고, 지적 사항마다 해당 파일·라인에 직접 코멘트를 답니다
    - PR의 최신 커밋 SHA를 먼저 확인합니다:
      ```
@@ -57,7 +65,7 @@ description: 현재 브랜치의 열린 PR을 Go 서버 관점에서 리뷰하�
 ..."
      ```
 
-6. 리뷰 결과 요약을 출력합니다 (LGTM / 수정 필요 항목).
+7. 리뷰 결과 요약을 출력합니다 (LGTM / 수정 필요 항목 / 중복으로 건너뛴 항목).
 
 주의사항:
 - 열린 PR이 없으면 안내 메시지 출력 후 중단

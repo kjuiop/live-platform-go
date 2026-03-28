@@ -33,7 +33,7 @@ func NewGinServer(cfg config.Server) (*Gin, error) {
 	}
 
 	router.Use(middleware.Recovery())
-	router.Use(middleware.LoggingMiddleware)
+	router.Use(middleware.LoggingMiddleware())
 	router.Use(middleware.SetCorsPolicy())
 
 	srv := &http.Server{
