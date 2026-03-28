@@ -55,18 +55,19 @@ func (r *RoomHandler) failResponse(c *gin.Context, statusCode, errorCode int, er
 
 func (r *RoomHandler) CreateRoom(c *gin.Context) {
 	req := form.RoomRequest{}
+	ctx := c.Request.Context()
 	if err := c.ShouldBind(&req); err != nil {
 		r.failResponse(c, http.StatusBadRequest, models.ErrParsing, fmt.Errorf("CreateRoom failed to parse request: %w", err))
 		return
 	}
 
 	roomInfo := domain.NewRoomInfo(req, r.cfg.Prefix)
-	if err := r.service.CreateChatRoom(c, *roomInfo); err != nil {
+	if err := r.service.CreateChatRoom(ctx, *roomInfo); err != nil {
 		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMSETError, fmt.Errorf("CreateRoom HMSET err : %w", err))
 		return
 	}
 
-	if err := r.service.RegisterRoomId(c, *roomInfo); err != nil {
+	if err := r.service.RegisterRoomId(ctx, *roomInfo); err != nil {
 		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMSETError, fmt.Errorf("register room id HMSET err : %w", err))
 		return
 	}

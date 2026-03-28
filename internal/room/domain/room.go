@@ -23,7 +23,7 @@ func NewRoomInfo(req form.RoomRequest, prefix string) *RoomInfo {
 		RoomId:       fmt.Sprintf("%s-%s", getChatPrefix(prefix), utils.GenUUID()),
 		CustomerId:   req.CustomerId,
 		ChannelKey:   req.ChannelKey,
-		BroadcastKey: req.BroadCastKey,
+		BroadcastKey: req.BroadcastKey,
 		CreatedAt:    time.Now().Unix(),
 	}
 }
@@ -60,6 +60,6 @@ func (r *RoomInfo) ConvertRedisRoomMapData() RoomMapRedisData {
 
 func getChatPrefix(prefix string) string {
 	array := strings.Split(prefix, ",")
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	return array[rand.Intn(len(array))]
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return array[rng.Intn(len(array))]
 }

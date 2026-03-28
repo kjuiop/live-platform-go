@@ -11,7 +11,7 @@ func TestNewRoomInfo(t *testing.T) {
 	req := form.RoomRequest{
 		CustomerId:   "customer-1",
 		ChannelKey:   "channel-abc",
-		BroadCastKey: "broadcast-xyz",
+		BroadcastKey: "broadcast-xyz",
 	}
 	prefix := "N1,N2"
 
@@ -40,8 +40,8 @@ func TestNewRoomInfo(t *testing.T) {
 	if info.ChannelKey != req.ChannelKey {
 		t.Errorf("ChannelKey: got %s, want %s", info.ChannelKey, req.ChannelKey)
 	}
-	if info.BroadcastKey != req.BroadCastKey {
-		t.Errorf("BroadcastKey: got %s, want %s", info.BroadcastKey, req.BroadCastKey)
+	if info.BroadcastKey != req.BroadcastKey {
+		t.Errorf("BroadcastKey: got %s, want %s", info.BroadcastKey, req.BroadcastKey)
 	}
 	if info.CreatedAt == 0 {
 		t.Error("CreatedAt: should not be zero")

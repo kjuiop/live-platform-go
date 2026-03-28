@@ -26,7 +26,7 @@ var errorList = map[int]CustomErr{
 
 const (
 	InternalError      = "internal server error"
-	InternalRedisError = "internal redis error occur"
+	InternalRedisError = "internal redis error occurred"
 )
 
 const (
@@ -54,13 +54,13 @@ var codeToMessage = map[int]string{
 	ErrInternalServerError: InternalError,
 }
 
-func GetCustomErrMessage(code int, error string) string {
+func GetCustomErrMessage(code int, errMsg string) string {
 	message, exists := codeToMessage[code]
 	if !exists {
 		return "Unknown error"
 	}
 
-	return fmt.Sprintf("%s, err : %s", message, error)
+	return fmt.Sprintf("%s, err : %s", message, errMsg)
 }
 
 func GetCustomErr(code int) error {
