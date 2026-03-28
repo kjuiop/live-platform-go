@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"math/rand"
+	"crypto/rand"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -9,7 +9,6 @@ import (
 
 func GenUUID() string {
 	t := time.Now().UTC()
-	entropy := rand.New(rand.NewSource(t.UnixNano()))
-	id := ulid.MustNew(ulid.Timestamp(t), entropy)
+	id := ulid.MustNew(ulid.Timestamp(t), rand.Reader)
 	return id.String()
 }
