@@ -67,11 +67,6 @@ func (r *RoomHandler) CreateRoom(c *gin.Context) {
 		return
 	}
 
-	if err := r.service.RegisterRoomId(ctx, *roomInfo); err != nil {
-		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMSETError, fmt.Errorf("register room id HMSET err : %w", err))
-		return
-	}
-
 	roomRes := form.RoomResponse{
 		RoomId:       roomInfo.RoomId,
 		CustomerId:   roomInfo.CustomerId,

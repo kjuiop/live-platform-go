@@ -58,6 +58,14 @@ func (r *Client) HSetField(ctx context.Context, key, field string, value interfa
 	return r.client.HSet(ctx, key, field, value).Err()
 }
 
+func (r *Client) RunScript(ctx context.Context, script *redis.Script, keys []string, args ...interface{}) error {
+	return script.Run(ctx, r.client, keys, args...).Err()
+}
+
+func (r *Client) Eval(ctx context.Context, script string, keys []string, args ...interface{}) error {
+	return r.client.Eval(ctx, script, keys, args...).Err()
+}
+
 func (r *Client) Close() {
 	if err := r.client.Close(); err != nil {
 		slog.Error("fail close redis client", "error", err)

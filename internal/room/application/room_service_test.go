@@ -14,6 +14,10 @@ type mockRoomRepository struct {
 	registerRoomMapErr error
 }
 
+func (m *mockRoomRepository) SaveRoom(_ context.Context, _ domain.RoomInfo) error {
+	return m.saveErr
+}
+
 func (m *mockRoomRepository) Save(_ context.Context, _ domain.RoomInfo) error {
 	return m.saveErr
 }
@@ -52,42 +56,6 @@ func TestRoomServiceImpl_CreateChatRoom(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateChatRoom() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestRoomServiceImpl_RegisterRoomId(t *testing.T) {
-	tests := []struct {
-		name               string
-		registerRoomMapErr error
-		wantErr            bool
-	}{
-		{
-			name:               "정상 등록",
-			registerRoomMapErr: nil,
-			wantErr:            false,
-		},
-		{
-			name:               "Redis 등록 실패",
-			registerRoomMapErr: errors.New("redis error"),
-			wantErr:            true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			repo := &mockRoomRepository{registerRoomMapErr: tt.registerRoomMapErr}
-			svc := NewRoomService(5*time.Second, repo)
-
-			err := svc.RegisterRoomId(context.Background(), domain.RoomInfo{
-				RoomId:       "room-1",
-				ChannelKey:   "ch-abc",
-				BroadcastKey: "bc-xyz",
-			})
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RegisterRoomId() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

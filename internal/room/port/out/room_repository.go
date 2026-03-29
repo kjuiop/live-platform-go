@@ -7,6 +7,5 @@ import (
 )
 
 type RoomRepository interface {
-	Save(ctx context.Context, room domain.RoomInfo) error
-	RegisterRoomMap(ctx context.Context, room domain.RoomInfo) error
+	SaveRoom(ctx context.Context, room domain.RoomInfo) error
 }

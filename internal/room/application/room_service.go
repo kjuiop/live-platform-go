@@ -28,19 +28,8 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 	ctx, cancel := context.WithTimeout(ctx, r.contextTimeout)
 	defer cancel()
 
-	if err := r.roomRepo.Save(ctx, room); err != nil {
+	if err := r.roomRepo.SaveRoom(ctx, room); err != nil {
 		return fmt.Errorf("failed to save room to redis : %w", err)
-	}
-
-	return nil
-}
-
-func (r *RoomServiceImpl) RegisterRoomId(ctx context.Context, room domain.RoomInfo) error {
-	ctx, cancel := context.WithTimeout(ctx, r.contextTimeout)
-	defer cancel()
-
-	if err := r.roomRepo.RegisterRoomMap(ctx, room); err != nil {
-		return fmt.Errorf("failed to register room id to redis : %w", err)
 	}
 
 	return nil
