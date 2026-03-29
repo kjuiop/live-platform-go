@@ -55,3 +55,22 @@ func (r *RoomRedisRepository) SaveRoom(ctx context.Context, room domain.RoomInfo
 	}
 	return nil
 }
+
+func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) error {
+	keys := []string{
+		roomKey(roomId),
+		roomMapKey,
+	}
+	cmd, err := r.redis.RunScriptResult(ctx, lua.DeleteRoomScript, keys, roomId)
+	if err != nil {
+		return fmt.Errorf("failed to delete room from redis : %w", err)
+	}
+	result, err := cmd.Int()
+	if err != nil {
+		return fmt.Errorf("failed to parse delete room script result : %w", err)
+	}
+	if result == 0 {
+		return domain.ErrRoomNotFound
+	}
+	return nil
+}

@@ -10,7 +10,12 @@ import (
 )
 
 type mockRoomRepository struct {
-	saveErr error
+	saveErr   error
+	deleteErr error
+}
+
+func (m *mockRoomRepository) DeleteRoom(_ context.Context, _ string) error {
+	return m.deleteErr
 }
 
 func (m *mockRoomRepository) SaveRoom(_ context.Context, _ domain.RoomInfo) error {
