@@ -63,12 +63,7 @@ func (r *RoomHandler) CreateRoom(c *gin.Context) {
 
 	roomInfo := domain.NewRoomInfo(req, r.cfg.Prefix)
 	if err := r.service.CreateChatRoom(ctx, *roomInfo); err != nil {
-		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMSETError, fmt.Errorf("CreateRoom HMSET err : %w", err))
-		return
-	}
-
-	if err := r.service.RegisterRoomId(ctx, *roomInfo); err != nil {
-		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMSETError, fmt.Errorf("register room id HMSET err : %w", err))
+		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMSETError, fmt.Errorf("CreateRoom failed to save room err : %w", err))
 		return
 	}
 

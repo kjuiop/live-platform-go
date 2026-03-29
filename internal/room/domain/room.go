@@ -28,24 +28,6 @@ func NewRoomInfo(req form.RoomRequest, prefix string) *RoomInfo {
 	}
 }
 
-type RoomRedisData struct {
-	RoomId       string `redis:"room_id"`
-	CustomerId   string `redis:"customer_id"`
-	ChannelKey   string `redis:"channel_key"`
-	BroadcastKey string `redis:"broadcast_key"`
-	CreatedAt    int64  `redis:"created_at"`
-}
-
-func (r *RoomInfo) ConvertRedisData() RoomRedisData {
-	return RoomRedisData{
-		RoomId:       r.RoomId,
-		CustomerId:   r.CustomerId,
-		ChannelKey:   r.ChannelKey,
-		BroadcastKey: r.BroadcastKey,
-		CreatedAt:    r.CreatedAt,
-	}
-}
-
 func getChatPrefix(prefix string) string {
 	array := strings.Split(prefix, ",")
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))

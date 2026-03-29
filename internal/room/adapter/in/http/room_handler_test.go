@@ -25,15 +25,10 @@ type TestClient struct {
 
 type mockRoomService struct {
 	createChatRoomErr error
-	registerRoomIdErr error
 }
 
 func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) error {
 	return m.createChatRoomErr
-}
-
-func (m *mockRoomService) RegisterRoomId(_ context.Context, _ domain.RoomInfo) error {
-	return m.registerRoomIdErr
 }
 
 func TestMain(m *testing.M) {
@@ -65,7 +60,6 @@ func TestCreateRoom(t *testing.T) {
 		name              string
 		body              map[string]string
 		createChatRoomErr error
-		registerRoomIdErr error
 		wantCode          int
 		wantRoomId        bool
 	}{
@@ -98,16 +92,6 @@ func TestCreateRoom(t *testing.T) {
 			createChatRoomErr: errors.New("redis error"),
 			wantCode:          http.StatusInternalServerError,
 		},
-		{
-			name: "RegisterRoomId 실패 - 500",
-			body: map[string]string{
-				"customer_id":   "customer-1",
-				"channel_key":   "ch-abc",
-				"broadcast_key": "bc-xyz",
-			},
-			registerRoomIdErr: errors.New("redis error"),
-			wantCode:          http.StatusInternalServerError,
-		},
 	}
 
 	for _, tt := range tests {
@@ -115,7 +99,6 @@ func TestCreateRoom(t *testing.T) {
 			// mock 서비스 에러 주입
 			svc := testClient.roomHandler.service.(*mockRoomService)
 			svc.createChatRoomErr = tt.createChatRoomErr
-			svc.registerRoomIdErr = tt.registerRoomIdErr
 
 			bodyBytes, _ := json.Marshal(tt.body)
 			req, err := http.NewRequest(
