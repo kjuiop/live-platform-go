@@ -17,10 +17,6 @@ func (m *mockRoomRepository) SaveRoom(_ context.Context, _ domain.RoomInfo) erro
 	return m.saveErr
 }
 
-func (m *mockRoomRepository) Save(_ context.Context, _ domain.RoomInfo) error {
-	return m.saveErr
-}
-
 func TestRoomServiceImpl_CreateChatRoom(t *testing.T) {
 	tests := []struct {
 		name    string
