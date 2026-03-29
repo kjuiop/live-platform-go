@@ -29,7 +29,7 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 	defer cancel()
 
 	if err := r.roomRepo.SaveRoom(ctx, room); err != nil {
-		return fmt.Errorf("failed to save room to redis : %w", err)
+		return fmt.Errorf("failed to save room to redis: %w", err)
 	}
 
 	return nil
