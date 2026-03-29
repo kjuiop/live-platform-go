@@ -10,8 +10,7 @@ import (
 )
 
 type mockRoomRepository struct {
-	saveErr            error
-	registerRoomMapErr error
+	saveErr error
 }
 
 func (m *mockRoomRepository) SaveRoom(_ context.Context, _ domain.RoomInfo) error {
@@ -20,10 +19,6 @@ func (m *mockRoomRepository) SaveRoom(_ context.Context, _ domain.RoomInfo) erro
 
 func (m *mockRoomRepository) Save(_ context.Context, _ domain.RoomInfo) error {
 	return m.saveErr
-}
-
-func (m *mockRoomRepository) RegisterRoomMap(_ context.Context, _ domain.RoomInfo) error {
-	return m.registerRoomMapErr
 }
 
 func TestRoomServiceImpl_CreateChatRoom(t *testing.T) {
