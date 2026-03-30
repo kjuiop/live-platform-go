@@ -32,6 +32,7 @@ func (r *RoomHandler) RegisterRoutes(router gin.IRouter) {
 	group := router.Group("/rooms")
 	group.POST("/", r.CreateChatRoom)
 	group.DELETE("/:roomId", r.DeleteChatRoom)
+	group.GET("/", r.GetChatRooms)
 }
 
 func (r *RoomHandler) successResponse(c *gin.Context, statusCode int, data interface{}) {
