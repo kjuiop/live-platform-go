@@ -14,6 +14,7 @@ import (
 
 	"github.com/kjuiop/live-platform-go/config"
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
 var testClient *TestClient
@@ -146,6 +147,7 @@ func TestDeleteRoom(t *testing.T) {
 		roomId            string
 		deleteChatRoomErr error
 		wantCode          int
+		wantErrorCode     string
 	}{
 		{
 			name:     "정상 삭제 - 204",
@@ -161,8 +163,9 @@ func TestDeleteRoom(t *testing.T) {
 		{
 			name:              "DeleteChatRoom 실패 - 500",
 			roomId:            "room-abc-123",
-			deleteChatRoomErr: errors.New("redis error"),
+			deleteChatRoomErr: serrors.ErrRedisDelete,
 			wantCode:          http.StatusInternalServerError,
+			wantErrorCode:     serrors.CodeRedisDelete,
 		},
 	}
 
@@ -188,6 +191,16 @@ func TestDeleteRoom(t *testing.T) {
 
 			if resp.StatusCode != tt.wantCode {
 				t.Errorf("status code: got %d, want %d", resp.StatusCode, tt.wantCode)
+			}
+
+			if tt.wantErrorCode != "" {
+				var body map[string]interface{}
+				if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+					t.Fatalf("decode body: %v", err)
+				}
+				if got, _ := body["error_code"].(string); got != tt.wantErrorCode {
+					t.Errorf("error_code: got %q, want %q", got, tt.wantErrorCode)
+				}
 			}
 		})
 	}
