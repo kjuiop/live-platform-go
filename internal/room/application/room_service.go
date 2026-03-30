@@ -3,7 +3,6 @@ package application
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
@@ -30,7 +29,7 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 	defer cancel()
 
 	if err := r.roomRepo.SaveRoom(ctx, room); err != nil {
-		return fmt.Errorf("failed to save room to redis: %w", err)
+		return err
 	}
 
 	return nil
@@ -44,7 +43,7 @@ func (r *RoomServiceImpl) DeleteChatRoom(ctx context.Context, roomId string) err
 		if errors.Is(err, domain.ErrRoomNotFound) {
 			return err
 		}
-		return fmt.Errorf("failed to delete room: %w", err)
+		return err
 	}
 	return nil
 }

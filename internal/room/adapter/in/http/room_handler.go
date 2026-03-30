@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/kjuiop/live-platform-go/config"
-	"github.com/kjuiop/live-platform-go/internal/room/adapter/in/http/errror"
+	rerror "github.com/kjuiop/live-platform-go/internal/room/adapter/in/http/error"
 	"github.com/kjuiop/live-platform-go/internal/room/adapter/in/http/form"
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
 	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
@@ -43,7 +43,7 @@ func (r *RoomHandler) successResponse(c *gin.Context, statusCode int, data inter
 }
 
 func (r *RoomHandler) failedResponse(c *gin.Context, err error) {
-	m := errror.GetMapping(err)
+	m := rerror.GetMapping(err)
 	logMessage := fmt.Sprintf("%s, err: %s", m.Msg, err.Error())
 	c.Errors = append(c.Errors, &gin.Error{
 		Err:  errors.New(logMessage),

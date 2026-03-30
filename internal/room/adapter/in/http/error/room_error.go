@@ -1,4 +1,4 @@
-package errror
+package error
 
 import (
 	"net/http"
@@ -7,7 +7,6 @@ import (
 	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
-// room 도메인 전용 에러 코드 — ROOM_ prefix
 const (
 	ErrCodeRoomNotFound = "R4401"
 	ErrCodeUnknown      = "UNKNOWN"
