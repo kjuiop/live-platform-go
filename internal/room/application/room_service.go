@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -40,6 +41,9 @@ func (r *RoomServiceImpl) DeleteChatRoom(ctx context.Context, roomId string) err
 	defer cancel()
 
 	if err := r.roomRepo.DeleteRoom(ctx, roomId); err != nil {
+		if errors.Is(err, domain.ErrRoomNotFound) {
+			return err
+		}
 		return fmt.Errorf("failed to delete room: %w", err)
 	}
 	return nil
