@@ -1,37 +1,29 @@
 package errror
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
+// room 도메인 전용 에러 코드 — ROOM_ prefix
 const (
-	ErrCodeUnknown        int = 5000
-	ErrCodeInvalidRequest int = 4001
-	ErrCodeRoomNotFound   int = 4401
-	ErrCodeRedisSave      int = 5001
-	ErrCodeRedisDelete    int = 5003
-)
-
-var (
-	ErrInvalidRequest = errors.New("invalid request")
-	ErrRedisSave      = errors.New("redis save error")
-	ErrRedisDelete    = errors.New("redis delete error")
+	ErrCodeRoomNotFound = "R4401"
+	ErrCodeUnknown      = "UNKNOWN"
 )
 
 type ErrMapping struct {
 	HttpStatus int
-	ErrorCode  int
+	ErrorCode  string
 	Msg        string
 }
 
 var DomainErrMap = map[error]ErrMapping{
-	domain.ErrRoomNotFound: {http.StatusNotFound, ErrCodeRoomNotFound, "not found chat room"},
-	ErrInvalidRequest:      {http.StatusBadRequest, ErrCodeInvalidRequest, "invalid request body"},
-	ErrRedisSave:           {http.StatusInternalServerError, ErrCodeRedisSave, "internal redis error occurred"},
-	ErrRedisDelete:         {http.StatusInternalServerError, ErrCodeRedisDelete, "internal redis error occurred"},
+	domain.ErrRoomNotFound:    {http.StatusNotFound, ErrCodeRoomNotFound, "not found chat room"},
+	serrors.ErrInvalidRequest: {http.StatusBadRequest, serrors.CodeInvalidRequest, "invalid request body"},
+	serrors.ErrRedisSave:      {http.StatusInternalServerError, serrors.CodeRedisSave, "internal redis error occurred"},
+	serrors.ErrRedisDelete:    {http.StatusInternalServerError, serrors.CodeRedisDelete, "internal redis error occurred"},
 }
 
 func GetMapping(err error) ErrMapping {

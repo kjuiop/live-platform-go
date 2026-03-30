@@ -12,6 +12,7 @@ import (
 	"github.com/kjuiop/live-platform-go/internal/room/adapter/in/http/form"
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
 	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 	"github.com/kjuiop/live-platform-go/internal/shared/models"
 )
 
@@ -35,8 +36,8 @@ func (r *RoomHandler) RegisterRoutes(router gin.IRouter) {
 
 func (r *RoomHandler) successResponse(c *gin.Context, statusCode int, data interface{}) {
 	c.JSON(statusCode, models.APIResponse{
-		ErrorCode: models.NoError,
-		Message:   models.GetCustomMessage(models.NoError),
+		ErrorCode: serrors.NoError,
+		Message:   serrors.GetCustomMessage(serrors.NoError),
 		Result:    data,
 	})
 }
@@ -58,13 +59,13 @@ func (r *RoomHandler) CreateChatRoom(c *gin.Context) {
 	req := form.RoomRequest{}
 	ctx := c.Request.Context()
 	if err := c.ShouldBind(&req); err != nil {
-		r.failedResponse(c, errror.ErrInvalidRequest)
+		r.failedResponse(c, serrors.ErrInvalidRequest)
 		return
 	}
 
 	roomInfo := domain.NewRoomInfo(req, r.cfg.Prefix)
 	if err := r.service.CreateChatRoom(ctx, *roomInfo); err != nil {
-		r.failedResponse(c, errror.ErrRedisSave)
+		r.failedResponse(c, serrors.ErrRedisSave)
 		return
 	}
 
@@ -82,7 +83,7 @@ func (r *RoomHandler) CreateChatRoom(c *gin.Context) {
 func (r *RoomHandler) DeleteChatRoom(c *gin.Context) {
 	roomId := c.Param("roomId")
 	if roomId == "" {
-		r.failedResponse(c, errror.ErrInvalidRequest)
+		r.failedResponse(c, serrors.ErrInvalidRequest)
 		return
 	}
 
