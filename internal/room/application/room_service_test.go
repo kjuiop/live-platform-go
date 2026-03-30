@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
 type mockRoomRepository struct {
@@ -79,10 +80,10 @@ func TestRoomServiceImpl_DeleteChatRoom(t *testing.T) {
 			wantNotFound: true,
 		},
 		{
-			name:        "기타 레포지토리 에러 wrapping",
+			name:        "기타 레포지토리 에러 → ErrRedisDelete 로 변환",
 			deleteErr:   repoErr,
 			wantErr:     true,
-			wantWrapped: repoErr,
+			wantWrapped: serrors.ErrRedisDelete,
 		},
 	}
 
