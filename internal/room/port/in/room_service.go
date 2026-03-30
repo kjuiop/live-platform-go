@@ -8,4 +8,5 @@ import (
 
 type RoomService interface {
 	CreateChatRoom(ctx context.Context, room domain.RoomInfo) error
+	DeleteChatRoom(ctx context.Context, roomId string) error
 }

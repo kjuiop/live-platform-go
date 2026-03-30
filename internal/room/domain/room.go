@@ -11,7 +11,9 @@ import (
 	"github.com/kjuiop/live-platform-go/internal/shared/utils"
 )
 
-var ErrRoomNotFound = errors.New("room not found")
+var (
+	ErrRoomNotFound = errors.New("room not found")
+)
 
 type RoomInfo struct {
 	RoomId       string `json:"room_id"`

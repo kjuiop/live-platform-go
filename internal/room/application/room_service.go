@@ -34,3 +34,13 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 
 	return nil
 }
+
+func (r *RoomServiceImpl) DeleteChatRoom(ctx context.Context, roomId string) error {
+	ctx, cancel := context.WithTimeout(ctx, r.contextTimeout)
+	defer cancel()
+
+	if err := r.roomRepo.DeleteRoom(ctx, roomId); err != nil {
+		return fmt.Errorf("failed to delete room: %w", err)
+	}
+	return nil
+}

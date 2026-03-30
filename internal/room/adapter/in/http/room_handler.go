@@ -28,7 +28,8 @@ func NewRoomHandler(cfg config.Policy, service roomin.RoomService) *RoomHandler 
 
 func (r *RoomHandler) RegisterRoutes(router gin.IRouter) {
 	group := router.Group("/rooms")
-	group.POST("/", r.CreateRoom)
+	group.POST("/", r.CreateChatRoom)
+	group.DELETE("/:roomId", r.DeleteChatRoom)
 }
 
 func (r *RoomHandler) successResponse(c *gin.Context, statusCode int, data interface{}) {
@@ -53,7 +54,7 @@ func (r *RoomHandler) failResponse(c *gin.Context, statusCode, errorCode int, er
 	})
 }
 
-func (r *RoomHandler) CreateRoom(c *gin.Context) {
+func (r *RoomHandler) CreateChatRoom(c *gin.Context) {
 	req := form.RoomRequest{}
 	ctx := c.Request.Context()
 	if err := c.ShouldBind(&req); err != nil {
@@ -76,4 +77,24 @@ func (r *RoomHandler) CreateRoom(c *gin.Context) {
 	}
 
 	r.successResponse(c, http.StatusCreated, roomRes)
+}
+
+func (r *RoomHandler) DeleteChatRoom(c *gin.Context) {
+	roomId := c.Param("roomId")
+	if roomId == "" {
+		r.failResponse(c, http.StatusBadRequest, models.ErrParsing, errors.New("DeleteChatRoom failed to parse roomId"))
+		return
+	}
+
+	ctx := c.Request.Context()
+	if err := r.service.DeleteChatRoom(ctx, roomId); err != nil {
+		if errors.Is(err, domain.ErrRoomNotFound) {
+			r.failResponse(c, http.StatusNotFound, models.ErrNotFoundChatRoom, fmt.Errorf("DeleteChatRoom failed to find room: %w", err))
+			return
+		}
+		r.failResponse(c, http.StatusInternalServerError, models.ErrRedisHMDELError, fmt.Errorf("DeleteChatRoom failed to delete room: %w", err))
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }

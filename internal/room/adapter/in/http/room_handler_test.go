@@ -25,10 +25,15 @@ type TestClient struct {
 
 type mockRoomService struct {
 	createChatRoomErr error
+	deleteChatRoomErr error
 }
 
 func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) error {
 	return m.createChatRoomErr
+}
+
+func (m *mockRoomService) DeleteChatRoom(_ context.Context, _ string) error {
+	return m.deleteChatRoomErr
 }
 
 func TestMain(m *testing.M) {
@@ -130,6 +135,59 @@ func TestCreateRoom(t *testing.T) {
 				if !ok || result["room_id"] == "" {
 					t.Error("room_id: should not be empty in response")
 				}
+			}
+		})
+	}
+}
+
+func TestDeleteRoom(t *testing.T) {
+	tests := []struct {
+		name              string
+		roomId            string
+		deleteChatRoomErr error
+		wantCode          int
+	}{
+		{
+			name:     "정상 삭제 - 204",
+			roomId:   "room-abc-123",
+			wantCode: http.StatusNoContent,
+		},
+		{
+			name:              "존재하지 않는 채팅방 - 404",
+			roomId:            "room-not-found",
+			deleteChatRoomErr: domain.ErrRoomNotFound,
+			wantCode:          http.StatusNotFound,
+		},
+		{
+			name:              "DeleteChatRoom 실패 - 500",
+			roomId:            "room-abc-123",
+			deleteChatRoomErr: errors.New("redis error"),
+			wantCode:          http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			svc := testClient.roomHandler.service.(*mockRoomService)
+			svc.deleteChatRoomErr = tt.deleteChatRoomErr
+
+			req, err := http.NewRequest(
+				http.MethodDelete,
+				testClient.srv.URL+"/api/v1/rooms/"+tt.roomId,
+				nil,
+			)
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatalf("request failed: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.wantCode {
+				t.Errorf("status code: got %d, want %d", resp.StatusCode, tt.wantCode)
 			}
 		})
 	}
