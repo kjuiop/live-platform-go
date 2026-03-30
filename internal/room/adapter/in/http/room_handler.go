@@ -42,9 +42,12 @@ func (r *RoomHandler) successResponse(c *gin.Context, statusCode int, data inter
 	})
 }
 
-func (r *RoomHandler) failedResponse(c *gin.Context, err error) {
+func (r *RoomHandler) failedResponse(c *gin.Context, err error, cause ...error) {
 	m := rerror.GetMapping(err)
 	logMessage := fmt.Sprintf("%s, err: %s", m.Msg, err.Error())
+	if len(cause) > 0 && cause[0] != nil {
+		logMessage = fmt.Sprintf("%s, cause: %s", logMessage, cause[0].Error())
+	}
 	c.Errors = append(c.Errors, &gin.Error{
 		Err:  errors.New(logMessage),
 		Type: gin.ErrorTypePrivate,
@@ -59,7 +62,7 @@ func (r *RoomHandler) CreateChatRoom(c *gin.Context) {
 	req := form.RoomRequest{}
 	ctx := c.Request.Context()
 	if err := c.ShouldBind(&req); err != nil {
-		r.failedResponse(c, serrors.ErrInvalidRequest)
+		r.failedResponse(c, serrors.ErrInvalidRequest, err)
 		return
 	}
 
