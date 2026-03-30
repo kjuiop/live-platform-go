@@ -7,9 +7,9 @@ const (
 	CodeInvalidRequest = "S4401"
 	CodeEmptyParam     = "S4402"
 	CodeInternalError  = "S5001"
-	CodeRedisSave      = "S5002"
-	CodeRedisDelete    = "S5003"
-	CodeRedisGet       = "S5004"
+	CodeRepoSave       = "S5002"
+	CodeRepoDelete     = "S5003"
+	CodeRepoGet        = "S5004"
 )
 
 var codeToMessage = map[string]string{
@@ -17,9 +17,9 @@ var codeToMessage = map[string]string{
 	CodeInvalidRequest: "invalid request body",
 	CodeEmptyParam:     "invalid params",
 	CodeInternalError:  "internal server error",
-	CodeRedisSave:      "internal storage error occurred",
-	CodeRedisDelete:    "internal storage error occurred",
-	CodeRedisGet:       "internal storage error occurred",
+	CodeRepoSave:       "internal storage error occurred",
+	CodeRepoDelete:     "internal storage error occurred",
+	CodeRepoGet:        "internal storage error occurred",
 }
 
 var (

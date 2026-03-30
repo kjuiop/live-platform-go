@@ -84,7 +84,7 @@ func (r *Client) HGetAllPipeline(ctx context.Context, keys []string) ([]map[stri
 		return nil, nil
 	}
 
-	pipe := r.client.TxPipeline()
+	pipe := r.client.Pipeline()
 	// command 를 실행할 목록 배열을 저장
 	cmds := make([]*redis.MapStringStringCmd, len(keys))
 	for i, key := range keys {
