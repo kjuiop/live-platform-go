@@ -83,7 +83,7 @@ func TestRoomServiceImpl_DeleteChatRoom(t *testing.T) {
 			name:        "기타 레포지토리 에러 → ErrRedisDelete 로 변환",
 			deleteErr:   repoErr,
 			wantErr:     true,
-			wantWrapped: serrors.ErrRedisDelete,
+			wantWrapped: serrors.ErrRepoDelete,
 		},
 	}
 
@@ -105,4 +105,9 @@ func TestRoomServiceImpl_DeleteChatRoom(t *testing.T) {
 			}
 		})
 	}
+}
+
+func (m *mockRoomRepository) GetRooms(ctx context.Context) ([]domain.RoomInfo, error) {
+	//TODO implement me
+	panic("implement me")
 }

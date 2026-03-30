@@ -10,6 +10,8 @@ import (
 	"os"
 	"testing"
 
+	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/kjuiop/live-platform-go/config"
@@ -27,6 +29,7 @@ type TestClient struct {
 type mockRoomService struct {
 	createChatRoomErr error
 	deleteChatRoomErr error
+	getChatRoomsErr   error
 }
 
 func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) error {
@@ -35,6 +38,10 @@ func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) e
 
 func (m *mockRoomService) DeleteChatRoom(_ context.Context, _ string) error {
 	return m.deleteChatRoomErr
+}
+
+func (m *mockRoomService) GetChatRooms(ctx context.Context) ([]domain.RoomInfo, error) {
+	return nil, m.getChatRoomsErr
 }
 
 func TestMain(m *testing.M) {
@@ -163,7 +170,7 @@ func TestDeleteRoom(t *testing.T) {
 		{
 			name:              "DeleteChatRoom 실패 - 500",
 			roomId:            "room-abc-123",
-			deleteChatRoomErr: serrors.ErrRedisDelete,
+			deleteChatRoomErr: roomin.ErrDeleteChatRoomFailed,
 			wantCode:          http.StatusInternalServerError,
 			wantErrorCode:     serrors.CodeRedisDelete,
 		},

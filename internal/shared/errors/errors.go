@@ -9,6 +9,7 @@ const (
 	CodeInternalError  = "S5001"
 	CodeRedisSave      = "S5002"
 	CodeRedisDelete    = "S5003"
+	CodeRedisGet       = "S5004"
 )
 
 var codeToMessage = map[string]string{
@@ -16,14 +17,16 @@ var codeToMessage = map[string]string{
 	CodeInvalidRequest: "invalid request body",
 	CodeEmptyParam:     "invalid params",
 	CodeInternalError:  "internal server error",
-	CodeRedisSave:      "internal redis error occurred",
-	CodeRedisDelete:    "internal redis error occurred",
+	CodeRedisSave:      "internal storage error occurred",
+	CodeRedisDelete:    "internal storage error occurred",
+	CodeRedisGet:       "internal storage error occurred",
 }
 
 var (
 	ErrInvalidRequest = errors.New("invalid request")
-	ErrRedisSave      = errors.New("redis save error")
-	ErrRedisDelete    = errors.New("redis delete error")
+	ErrRepoSave       = errors.New("repository save error")
+	ErrRepoDelete     = errors.New("repository delete error")
+	ErrRepoGet        = errors.New("repository get error")
 )
 
 func GetCustomMessage(code string) string {
