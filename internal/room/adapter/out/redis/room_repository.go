@@ -108,7 +108,11 @@ func (r *RoomRedisRepository) GetRooms(ctx context.Context) ([]domain.RoomInfo, 
 			slog.Warn("GetRooms: room key has expired, skipping", "roomKey", keys[i])
 			continue
 		}
-		createdAt, _ := strconv.ParseInt(m["created_at"], 10, 64)
+		createdAt, err := strconv.ParseInt(m["created_at"], 10, 64)
+		if err != nil {
+			slog.Warn("GetRooms: invalid created_at, skipping", "roomId", m["room_id"], "value", m["created_at"])
+			continue
+		}
 		rooms = append(rooms, domain.RoomInfo{
 			RoomId:       m["room_id"],
 			CustomerId:   m["customer_id"],
