@@ -13,3 +13,8 @@ type RoomResponse struct {
 	BroadcastKey string `json:"broadcast_key,omitempty"`
 	CreatedAt    int64  `json:"created_at,omitempty"`
 }
+
+type RoomListResponse struct {
+	Rooms []RoomResponse `json:"rooms"`
+	Total int            `json:"total"`
+}

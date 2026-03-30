@@ -32,6 +32,7 @@ func (r *RoomHandler) RegisterRoutes(router gin.IRouter) {
 	group := router.Group("/rooms")
 	group.POST("/", r.CreateChatRoom)
 	group.DELETE("/:roomId", r.DeleteChatRoom)
+	group.GET("/", r.GetChatRooms)
 }
 
 func (r *RoomHandler) successResponse(c *gin.Context, statusCode int, data interface{}) {
@@ -68,7 +69,7 @@ func (r *RoomHandler) CreateChatRoom(c *gin.Context) {
 
 	roomInfo := domain.NewRoomInfo(req, r.cfg.Prefix)
 	if err := r.service.CreateChatRoom(ctx, *roomInfo); err != nil {
-		r.failedResponse(c, serrors.ErrRedisSave)
+		r.failedResponse(c, err)
 		return
 	}
 
@@ -97,4 +98,29 @@ func (r *RoomHandler) DeleteChatRoom(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func (r *RoomHandler) GetChatRooms(c *gin.Context) {
+	ctx := c.Request.Context()
+	rooms, err := r.service.GetChatRooms(ctx)
+	if err != nil {
+		r.failedResponse(c, err)
+		return
+	}
+
+	roomRes := make([]form.RoomResponse, len(rooms))
+	for i, room := range rooms {
+		roomRes[i] = form.RoomResponse{
+			RoomId:       room.RoomId,
+			CustomerId:   room.CustomerId,
+			ChannelKey:   room.ChannelKey,
+			BroadcastKey: room.BroadcastKey,
+			CreatedAt:    room.CreatedAt,
+		}
+	}
+
+	r.successResponse(c, http.StatusOK, form.RoomListResponse{
+		Rooms: roomRes,
+		Total: len(roomRes),
+	})
 }

@@ -10,11 +10,13 @@ import (
 	"os"
 	"testing"
 
+	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/kjuiop/live-platform-go/config"
+	rerror "github.com/kjuiop/live-platform-go/internal/room/adapter/in/http/error"
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
-	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
 var testClient *TestClient
@@ -25,8 +27,10 @@ type TestClient struct {
 }
 
 type mockRoomService struct {
-	createChatRoomErr error
-	deleteChatRoomErr error
+	createChatRoomErr  error
+	deleteChatRoomErr  error
+	getChatRoomsResult []domain.RoomInfo
+	getChatRoomsErr    error
 }
 
 func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) error {
@@ -35,6 +39,10 @@ func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) e
 
 func (m *mockRoomService) DeleteChatRoom(_ context.Context, _ string) error {
 	return m.deleteChatRoomErr
+}
+
+func (m *mockRoomService) GetChatRooms(_ context.Context) ([]domain.RoomInfo, error) {
+	return m.getChatRoomsResult, m.getChatRoomsErr
 }
 
 func TestMain(m *testing.M) {
@@ -141,6 +149,90 @@ func TestCreateRoom(t *testing.T) {
 	}
 }
 
+func TestGetChatRooms(t *testing.T) {
+	tests := []struct {
+		name               string
+		getChatRoomsResult []domain.RoomInfo
+		getChatRoomsErr    error
+		wantCode           int
+		wantTotal          int
+		wantErrorCode      string
+	}{
+		{
+			name:      "빈 목록 반환 - 200",
+			wantCode:  http.StatusOK,
+			wantTotal: 0,
+		},
+		{
+			name: "채팅방 목록 반환 - 200",
+			getChatRoomsResult: []domain.RoomInfo{
+				{RoomId: "room-1", CustomerId: "c1", ChannelKey: "ch-abc", BroadcastKey: "bc-xyz", CreatedAt: 1000},
+				{RoomId: "room-2", CustomerId: "c2", ChannelKey: "ch-def", BroadcastKey: "bc-uvw", CreatedAt: 2000},
+			},
+			wantCode:  http.StatusOK,
+			wantTotal: 2,
+		},
+		{
+			name:            "GetChatRooms 실패 - 500",
+			getChatRoomsErr: roomin.ErrGetChatRoomsFailed,
+			wantCode:        http.StatusInternalServerError,
+			wantErrorCode:   rerror.ErrCodeGetFailed,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			svc := testClient.roomHandler.service.(*mockRoomService)
+			svc.getChatRoomsResult = tt.getChatRoomsResult
+			svc.getChatRoomsErr = tt.getChatRoomsErr
+
+			req, err := http.NewRequest(
+				http.MethodGet,
+				testClient.srv.URL+"/api/v1/rooms/",
+				nil,
+			)
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatalf("request failed: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.wantCode {
+				t.Errorf("status code: got %d, want %d", resp.StatusCode, tt.wantCode)
+			}
+
+			var body map[string]interface{}
+			if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+				t.Fatalf("decode body: %v", err)
+			}
+
+			if tt.wantErrorCode != "" {
+				if got, _ := body["error_code"].(string); got != tt.wantErrorCode {
+					t.Errorf("error_code: got %q, want %q", got, tt.wantErrorCode)
+				}
+				return
+			}
+
+			result, ok := body["result"].(map[string]interface{})
+			if !ok {
+				t.Fatal("result field missing in response")
+			}
+			total, _ := result["total"].(float64)
+			if int(total) != tt.wantTotal {
+				t.Errorf("total: got %d, want %d", int(total), tt.wantTotal)
+			}
+			rooms, _ := result["rooms"].([]interface{})
+			if len(rooms) != tt.wantTotal {
+				t.Errorf("rooms length: got %d, want %d", len(rooms), tt.wantTotal)
+			}
+		})
+	}
+}
+
 func TestDeleteRoom(t *testing.T) {
 	tests := []struct {
 		name              string
@@ -163,9 +255,9 @@ func TestDeleteRoom(t *testing.T) {
 		{
 			name:              "DeleteChatRoom 실패 - 500",
 			roomId:            "room-abc-123",
-			deleteChatRoomErr: serrors.ErrRedisDelete,
+			deleteChatRoomErr: roomin.ErrDeleteChatRoomFailed,
 			wantCode:          http.StatusInternalServerError,
-			wantErrorCode:     serrors.CodeRedisDelete,
+			wantErrorCode:     rerror.ErrCodeDeleteFailed,
 		},
 	}
 

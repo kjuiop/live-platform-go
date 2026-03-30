@@ -3,7 +3,11 @@ package redis
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"strconv"
 	"time"
+
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 
 	"github.com/kjuiop/live-platform-go/internal/room/adapter/out/redis/lua"
 
@@ -51,7 +55,7 @@ func (r *RoomRedisRepository) SaveRoom(ctx context.Context, room domain.RoomInfo
 		room.RoomId,
 	}
 	if err := r.redis.RunScript(ctx, lua.SaveRoomScript, keys, args...); err != nil {
-		return err
+		return fmt.Errorf("%w: %w", serrors.ErrRepoSave, err)
 	}
 	return nil
 }
@@ -63,7 +67,7 @@ func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) err
 	}
 	cmd, err := r.redis.RunScriptResult(ctx, lua.DeleteRoomScript, keys, roomId)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %w", serrors.ErrRepoDelete, err)
 	}
 	result, err := cmd.Int()
 	if err != nil {
@@ -73,4 +77,49 @@ func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) err
 		return domain.ErrRoomNotFound
 	}
 	return nil
+}
+
+func (r *RoomRedisRepository) GetRooms(ctx context.Context) ([]domain.RoomInfo, error) {
+	// 1. room-map 에서 모든 roomId 조회
+	roomIds, err := r.redis.HVals(ctx, roomMapKey)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", serrors.ErrRepoGet, err)
+	}
+	if len(roomIds) == 0 {
+		return []domain.RoomInfo{}, nil
+	}
+
+	// 2. 각 roomId의 키 생성
+	keys := make([]string, len(roomIds))
+	for i, id := range roomIds {
+		keys[i] = roomKey(id)
+	}
+
+	// 3. Pipeline 으로 HGETALL 일괄 조회
+	results, err := r.redis.HGetAllPipeline(ctx, keys)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", serrors.ErrRepoGet, err)
+	}
+
+	// 4. 결과 파싱 (TTL 만료된 방 skip)
+	rooms := make([]domain.RoomInfo, 0, len(results))
+	for i, m := range results {
+		if len(m) == 0 {
+			slog.Warn("GetRooms: room key has expired, skipping", "roomKey", keys[i])
+			continue
+		}
+		createdAt, err := strconv.ParseInt(m["created_at"], 10, 64)
+		if err != nil {
+			slog.Warn("GetRooms: invalid created_at, skipping", "roomId", m["room_id"], "value", m["created_at"])
+			continue
+		}
+		rooms = append(rooms, domain.RoomInfo{
+			RoomId:       m["room_id"],
+			CustomerId:   m["customer_id"],
+			ChannelKey:   m["channel_key"],
+			BroadcastKey: m["broadcast_key"],
+			CreatedAt:    createdAt,
+		})
+	}
+	return rooms, nil
 }
