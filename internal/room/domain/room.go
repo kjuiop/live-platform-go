@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -8,6 +9,10 @@ import (
 
 	"github.com/kjuiop/live-platform-go/internal/room/adapter/in/http/form"
 	"github.com/kjuiop/live-platform-go/internal/shared/utils"
+)
+
+var (
+	ErrRoomNotFound = errors.New("room not found")
 )
 
 type RoomInfo struct {

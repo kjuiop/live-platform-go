@@ -14,6 +14,7 @@ import (
 
 	"github.com/kjuiop/live-platform-go/config"
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
 var testClient *TestClient
@@ -25,10 +26,15 @@ type TestClient struct {
 
 type mockRoomService struct {
 	createChatRoomErr error
+	deleteChatRoomErr error
 }
 
 func (m *mockRoomService) CreateChatRoom(_ context.Context, _ domain.RoomInfo) error {
 	return m.createChatRoomErr
+}
+
+func (m *mockRoomService) DeleteChatRoom(_ context.Context, _ string) error {
+	return m.deleteChatRoomErr
 }
 
 func TestMain(m *testing.M) {
@@ -129,6 +135,71 @@ func TestCreateRoom(t *testing.T) {
 				result, ok := body["result"].(map[string]interface{})
 				if !ok || result["room_id"] == "" {
 					t.Error("room_id: should not be empty in response")
+				}
+			}
+		})
+	}
+}
+
+func TestDeleteRoom(t *testing.T) {
+	tests := []struct {
+		name              string
+		roomId            string
+		deleteChatRoomErr error
+		wantCode          int
+		wantErrorCode     string
+	}{
+		{
+			name:     "정상 삭제 - 204",
+			roomId:   "room-abc-123",
+			wantCode: http.StatusNoContent,
+		},
+		{
+			name:              "존재하지 않는 채팅방 - 404",
+			roomId:            "room-not-found",
+			deleteChatRoomErr: domain.ErrRoomNotFound,
+			wantCode:          http.StatusNotFound,
+		},
+		{
+			name:              "DeleteChatRoom 실패 - 500",
+			roomId:            "room-abc-123",
+			deleteChatRoomErr: serrors.ErrRedisDelete,
+			wantCode:          http.StatusInternalServerError,
+			wantErrorCode:     serrors.CodeRedisDelete,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			svc := testClient.roomHandler.service.(*mockRoomService)
+			svc.deleteChatRoomErr = tt.deleteChatRoomErr
+
+			req, err := http.NewRequest(
+				http.MethodDelete,
+				testClient.srv.URL+"/api/v1/rooms/"+tt.roomId,
+				nil,
+			)
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatalf("request failed: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.wantCode {
+				t.Errorf("status code: got %d, want %d", resp.StatusCode, tt.wantCode)
+			}
+
+			if tt.wantErrorCode != "" {
+				var body map[string]interface{}
+				if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+					t.Fatalf("decode body: %v", err)
+				}
+				if got, _ := body["error_code"].(string); got != tt.wantErrorCode {
+					t.Errorf("error_code: got %q, want %q", got, tt.wantErrorCode)
 				}
 			}
 		})

@@ -3,6 +3,8 @@ package http
 import (
 	"net/http"
 
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
+
 	"github.com/kjuiop/live-platform-go/internal/shared/models"
 	"github.com/kjuiop/live-platform-go/internal/system/adapter/in/http/form"
 
@@ -29,8 +31,8 @@ func (h *SystemHandler) RegisterRoutes(r gin.IRouter) {
 func (s *SystemHandler) successResponse(c *gin.Context, statusCode int, data interface{}) {
 
 	c.JSON(statusCode, models.APIResponse{
-		ErrorCode: models.NoError,
-		Message:   models.GetCustomMessage(models.NoError),
+		ErrorCode: serrors.NoError,
+		Message:   serrors.GetCustomMessage(serrors.NoError),
 		Result:    data,
 	})
 }

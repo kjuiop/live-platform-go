@@ -2,12 +2,13 @@ package application
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
 	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
 	roomoutport "github.com/kjuiop/live-platform-go/internal/room/port/out"
+	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
 )
 
 var _ roomin.RoomService = (*RoomServiceImpl)(nil)
@@ -29,8 +30,21 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 	defer cancel()
 
 	if err := r.roomRepo.SaveRoom(ctx, room); err != nil {
-		return fmt.Errorf("failed to save room to redis: %w", err)
+		return serrors.ErrRedisSave
 	}
 
+	return nil
+}
+
+func (r *RoomServiceImpl) DeleteChatRoom(ctx context.Context, roomId string) error {
+	ctx, cancel := context.WithTimeout(ctx, r.contextTimeout)
+	defer cancel()
+
+	if err := r.roomRepo.DeleteRoom(ctx, roomId); err != nil {
+		if errors.Is(err, domain.ErrRoomNotFound) {
+			return domain.ErrRoomNotFound
+		}
+		return serrors.ErrRedisDelete
+	}
 	return nil
 }

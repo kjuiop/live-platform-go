@@ -51,7 +51,26 @@ func (r *RoomRedisRepository) SaveRoom(ctx context.Context, room domain.RoomInfo
 		room.RoomId,
 	}
 	if err := r.redis.RunScript(ctx, lua.SaveRoomScript, keys, args...); err != nil {
-		return fmt.Errorf("failed to save room to redis : %w", err)
+		return err
+	}
+	return nil
+}
+
+func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) error {
+	keys := []string{
+		roomKey(roomId),
+		roomMapKey,
+	}
+	cmd, err := r.redis.RunScriptResult(ctx, lua.DeleteRoomScript, keys, roomId)
+	if err != nil {
+		return err
+	}
+	result, err := cmd.Int()
+	if err != nil {
+		return err
+	}
+	if result == 0 {
+		return domain.ErrRoomNotFound
 	}
 	return nil
 }
