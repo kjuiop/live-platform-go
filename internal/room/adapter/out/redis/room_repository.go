@@ -55,7 +55,7 @@ func (r *RoomRedisRepository) SaveRoom(ctx context.Context, room domain.RoomInfo
 		room.RoomId,
 	}
 	if err := r.redis.RunScript(ctx, lua.SaveRoomScript, keys, args...); err != nil {
-		return err
+		return fmt.Errorf("%w: %w", serrors.ErrRepoSave, err)
 	}
 	return nil
 }
@@ -67,7 +67,7 @@ func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) err
 	}
 	cmd, err := r.redis.RunScriptResult(ctx, lua.DeleteRoomScript, keys, roomId)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %w", serrors.ErrRepoDelete, err)
 	}
 	result, err := cmd.Int()
 	if err != nil {
