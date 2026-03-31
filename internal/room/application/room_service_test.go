@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
+	roomerr "github.com/kjuiop/live-platform-go/internal/room/domain/errors"
+
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
-	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
 )
 
 type mockRoomRepository struct {
@@ -81,7 +82,7 @@ func TestRoomServiceImpl_DeleteChatRoom(t *testing.T) {
 		},
 		{
 			name:         "ErrRoomNotFound 그대로 전달",
-			deleteErr:    domain.ErrRoomNotFound,
+			deleteErr:    roomerr.ErrRoomNotFound,
 			wantErr:      true,
 			wantNotFound: true,
 		},
@@ -89,7 +90,7 @@ func TestRoomServiceImpl_DeleteChatRoom(t *testing.T) {
 			name:        "기타 레포지토리 에러 → ErrDeleteChatRoomFailed 로 변환",
 			deleteErr:   repoErr,
 			wantErr:     true,
-			wantWrapped: roomin.ErrDeleteChatRoomFailed,
+			wantWrapped: roomerr.ErrDeleteChatRoomFailed,
 		},
 	}
 
@@ -103,7 +104,7 @@ func TestRoomServiceImpl_DeleteChatRoom(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DeleteChatRoom() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if tt.wantNotFound && !errors.Is(err, domain.ErrRoomNotFound) {
+			if tt.wantNotFound && !errors.Is(err, roomerr.ErrRoomNotFound) {
 				t.Errorf("DeleteChatRoom() expected ErrRoomNotFound, got %v", err)
 			}
 			if tt.wantWrapped != nil && !errors.Is(err, tt.wantWrapped) {
@@ -142,7 +143,7 @@ func TestRoomServiceImpl_GetChatRooms(t *testing.T) {
 			name:        "Repository 에러 → ErrGetChatRoomsFailed 래핑",
 			getRoomsErr: errors.New("redis error"),
 			wantErr:     true,
-			wantErrIs:   roomin.ErrGetChatRoomsFailed,
+			wantErrIs:   roomerr.ErrGetChatRoomsFailed,
 		},
 	}
 

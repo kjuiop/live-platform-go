@@ -7,6 +7,8 @@ import (
 	"sort"
 	"time"
 
+	roomerr "github.com/kjuiop/live-platform-go/internal/room/domain/errors"
+
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
 	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
 	roomoutport "github.com/kjuiop/live-platform-go/internal/room/port/out"
@@ -31,7 +33,7 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 	defer cancel()
 
 	if err := r.roomRepo.SaveRoom(ctx, room); err != nil {
-		return fmt.Errorf("%w: %w", roomin.ErrCreateChatRoomFailed, err)
+		return fmt.Errorf("roomSrv:CreateChatRoom: %w:%w", roomerr.ErrCreateChatRoomFailed, err)
 	}
 
 	return nil
@@ -42,10 +44,10 @@ func (r *RoomServiceImpl) DeleteChatRoom(ctx context.Context, roomId string) err
 	defer cancel()
 
 	if err := r.roomRepo.DeleteRoom(ctx, roomId); err != nil {
-		if errors.Is(err, domain.ErrRoomNotFound) {
-			return domain.ErrRoomNotFound
+		if errors.Is(err, roomerr.ErrRoomNotFound) {
+			return roomerr.ErrRoomNotFound
 		}
-		return fmt.Errorf("%w: %w", roomin.ErrDeleteChatRoomFailed, err)
+		return fmt.Errorf("roomSrv.DeleteChatRoom: %w: %w", roomerr.ErrDeleteChatRoomFailed, err)
 	}
 	return nil
 }
@@ -56,7 +58,7 @@ func (r *RoomServiceImpl) GetChatRooms(ctx context.Context) ([]domain.RoomInfo, 
 
 	rooms, err := r.roomRepo.GetRooms(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", roomin.ErrGetChatRoomsFailed, err)
+		return nil, fmt.Errorf("roomSrv.GetChatRooms: %w:%w", roomerr.ErrGetChatRoomsFailed, err)
 	}
 
 	sort.Slice(rooms, func(i, j int) bool {

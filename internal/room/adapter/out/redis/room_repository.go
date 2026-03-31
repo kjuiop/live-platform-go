@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	serrors "github.com/kjuiop/live-platform-go/internal/shared/errors"
-
 	"github.com/kjuiop/live-platform-go/internal/room/adapter/out/redis/lua"
 
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
@@ -55,7 +53,7 @@ func (r *RoomRedisRepository) SaveRoom(ctx context.Context, room domain.RoomInfo
 		room.RoomId,
 	}
 	if err := r.redis.RunScript(ctx, lua.SaveRoomScript, keys, args...); err != nil {
-		return fmt.Errorf("%w: %w", serrors.ErrRepoSave, err)
+		return fmt.Errorf("roomRepo.SaveRoom: %w", err)
 	}
 	return nil
 }
@@ -67,14 +65,14 @@ func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) err
 	}
 	cmd, err := r.redis.RunScriptResult(ctx, lua.DeleteRoomScript, keys, roomId)
 	if err != nil {
-		return fmt.Errorf("%w: %w", serrors.ErrRepoDelete, err)
+		return fmt.Errorf("roomRepo:DeleteRoom: %w", err)
 	}
 	result, err := cmd.Int()
 	if err != nil {
 		return err
 	}
 	if result == 0 {
-		return domain.ErrRoomNotFound
+		return fmt.Errorf("roomRepo:DeleteRoom: room not found")
 	}
 	return nil
 }
@@ -83,7 +81,7 @@ func (r *RoomRedisRepository) GetRooms(ctx context.Context) ([]domain.RoomInfo, 
 	// 1. room-map 에서 모든 roomId 조회
 	roomIds, err := r.redis.HVals(ctx, roomMapKey)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", serrors.ErrRepoGet, err)
+		return nil, fmt.Errorf("roomRepo.GetRooms: %w", err)
 	}
 	if len(roomIds) == 0 {
 		return []domain.RoomInfo{}, nil
@@ -98,7 +96,7 @@ func (r *RoomRedisRepository) GetRooms(ctx context.Context) ([]domain.RoomInfo, 
 	// 3. Pipeline 으로 HGETALL 일괄 조회
 	results, err := r.redis.HGetAllPipeline(ctx, keys)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", serrors.ErrRepoGet, err)
+		return nil, fmt.Errorf("roomRepo.GetRooms:: %w", err)
 	}
 
 	// 4. 결과 파싱 (TTL 만료된 방 skip)
