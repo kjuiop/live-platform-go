@@ -16,5 +16,17 @@ services:
       retries: 3
     restart: unless-stopped
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: live-platform-redisinsight
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+
 volumes:
   redis-data:
+  redisinsight-data:
