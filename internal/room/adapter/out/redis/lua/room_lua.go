@@ -11,6 +11,7 @@ redis.call('HSET', KEYS[1],
     'created_at',     ARGV[5])
 redis.call('EXPIRE', KEYS[1], ARGV[6])
 redis.call('HSET', KEYS[2], ARGV[7], ARGV[8])
+redis.call('HEXPIRE', KEYS[2], ARGV[6], 'FIELDS', 1, ARGV[7])
 return 1
 `)
 

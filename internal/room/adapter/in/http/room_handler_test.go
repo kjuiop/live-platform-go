@@ -10,7 +10,7 @@ import (
 	"os"
 	"testing"
 
-	roomin "github.com/kjuiop/live-platform-go/internal/room/port/in"
+	roomerr "github.com/kjuiop/live-platform-go/internal/room/domain/errors"
 
 	"github.com/gin-gonic/gin"
 
@@ -174,7 +174,7 @@ func TestGetChatRooms(t *testing.T) {
 		},
 		{
 			name:            "GetChatRooms 실패 - 500",
-			getChatRoomsErr: roomin.ErrGetChatRoomsFailed,
+			getChatRoomsErr: roomerr.ErrGetChatRoomsFailed,
 			wantCode:        http.StatusInternalServerError,
 			wantErrorCode:   rerror.ErrCodeGetFailed,
 		},
@@ -249,13 +249,13 @@ func TestDeleteRoom(t *testing.T) {
 		{
 			name:              "존재하지 않는 채팅방 - 404",
 			roomId:            "room-not-found",
-			deleteChatRoomErr: domain.ErrRoomNotFound,
+			deleteChatRoomErr: roomerr.ErrRoomNotFound,
 			wantCode:          http.StatusNotFound,
 		},
 		{
 			name:              "DeleteChatRoom 실패 - 500",
 			roomId:            "room-abc-123",
-			deleteChatRoomErr: roomin.ErrDeleteChatRoomFailed,
+			deleteChatRoomErr: roomerr.ErrDeleteChatRoomFailed,
 			wantCode:          http.StatusInternalServerError,
 			wantErrorCode:     rerror.ErrCodeDeleteFailed,
 		},
