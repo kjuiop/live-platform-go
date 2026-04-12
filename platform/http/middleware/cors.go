@@ -9,8 +9,8 @@ import (
 
 func SetCorsPolicy() gin.HandlerFunc {
 	return cors.New(cors.Config{
+		AllowAllOrigins:  true,
 		AllowWebSockets:  true,
-		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
