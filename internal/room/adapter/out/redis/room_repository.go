@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	roomKeyPrefix = "live-platform-room"
-	roomMapKey    = "live-platform-room-map"
+	roomKeyPrefix = "live:rooms"
+	roomMapKey    = "live:room-map"
 	RoomExpire    = time.Duration(7) * 24 * time.Hour
 )
 
