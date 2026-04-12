@@ -33,7 +33,7 @@ func (r *RoomServiceImpl) CreateChatRoom(ctx context.Context, room domain.RoomIn
 	defer cancel()
 
 	if err := r.roomRepo.SaveRoom(ctx, room); err != nil {
-		return fmt.Errorf("roomSrv:CreateChatRoom: %w:%w", roomerr.ErrCreateChatRoomFailed, err)
+		return fmt.Errorf("roomSrv:CreateChatRoom: %w: %w", roomerr.ErrCreateChatRoomFailed, err)
 	}
 
 	return nil
@@ -58,7 +58,7 @@ func (r *RoomServiceImpl) GetChatRooms(ctx context.Context) ([]domain.RoomInfo, 
 
 	rooms, err := r.roomRepo.GetRooms(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("roomSrv.GetChatRooms: %w:%w", roomerr.ErrGetChatRoomsFailed, err)
+		return nil, fmt.Errorf("roomSrv.GetChatRooms: %w: %w", roomerr.ErrGetChatRoomsFailed, err)
 	}
 
 	sort.Slice(rooms, func(i, j int) bool {

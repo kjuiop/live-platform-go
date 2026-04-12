@@ -10,13 +10,14 @@ import (
 	"github.com/kjuiop/live-platform-go/internal/room/adapter/out/redis/lua"
 
 	"github.com/kjuiop/live-platform-go/internal/room/domain"
+	roomerr "github.com/kjuiop/live-platform-go/internal/room/domain/errors"
 	roomoutport "github.com/kjuiop/live-platform-go/internal/room/port/out"
 	"github.com/kjuiop/live-platform-go/platform/redis"
 )
 
 const (
 	roomKeyPrefix = "live:rooms"
-	roomMapKey    = "live:room-map"
+	roomMapKey    = "live:rooms-map"
 	RoomExpire    = time.Duration(7) * 24 * time.Hour
 )
 
@@ -72,7 +73,7 @@ func (r *RoomRedisRepository) DeleteRoom(ctx context.Context, roomId string) err
 		return err
 	}
 	if result == 0 {
-		return fmt.Errorf("roomRepo:DeleteRoom: room not found")
+		return fmt.Errorf("roomRepo:DeleteRoom: %w", roomerr.ErrRoomNotFound)
 	}
 	return nil
 }
