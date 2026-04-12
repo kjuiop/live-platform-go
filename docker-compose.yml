@@ -17,8 +17,10 @@ services:
     restart: unless-stopped
 
   redisinsight:
-    image: redis/redisinsight:latest
+    image: redis/redisinsight:2.66.0
     container_name: live-platform-redisinsight
+    profiles:
+      - dev-tools
     ports:
       - "5540:5540"
     volumes:

@@ -22,7 +22,7 @@ LDFLAGS+=-s -w
 
 LOCAL_PREFIX=github.com/kjuiop/live-platform-go
 
-.PHONY: build api-build worker-build test fmt lint target-version build_num clean
+.PHONY: build api-build worker-build test fmt lint target-version build_num clean redisinsight
 
 api: config fmt lint api-build
 
@@ -79,6 +79,9 @@ git-hooks:
 	@chmod +x .githooks/commit-msg
 	@chmod +x .githooks/pre-commit
 	@echo "Done. (commit-msg & pre-commit hook active)"
+
+redisinsight:
+	docker compose --profile dev-tools up redisinsight -d
 
 clean:
 	@echo "Cleaning up..."
